@@ -140,13 +140,7 @@ class Form
 	 */
 	public static function supportedRules(): array
     {
-		$supportedRules = [];
-
-		foreach (static::$rules as $key => $value) {
-			$supportedRules[] = $key;
-		}
-
-		return $supportedRules;
+		return array_keys(static::$rules);
 	}
 
 	/**
