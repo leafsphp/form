@@ -180,7 +180,7 @@ class Form
 		$fields = [];
 
 		foreach ($rules as $param => $rule) {
-			$fields[] = ['name' => $param, 'value' => Request::get($param), 'rule' => $rule];
+			$fields[] = ['name' => $param, 'value' => (new Request)->get($param), 'rule' => $rule];
 		}
 
 		foreach ($fields as $field) {
@@ -286,7 +286,7 @@ class Form
 	 */
 	public static function body()
 	{
-		return Request::body();
+		return (new Request)->body();
 	}
 
 	/**
@@ -296,7 +296,7 @@ class Form
 	 */
 	public static function get()
 	{
-		return Request::body();
+		return (new Request)->body();
 	}
 
 	/**
