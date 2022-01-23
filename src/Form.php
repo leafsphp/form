@@ -25,14 +25,14 @@ class Form
 	 * Default and registered validation rules
 	 */
 	protected static $rules = [
-		"required" => null,
-		"number" => null,
-		"text" => null,
-		"textonly" => null,
-		"validusername" => null,
-		"username" => null,
-		"email" => null,
-		"nospaces" => null
+		'required' => null,
+		'number' => null,
+		'text' => null,
+		'textonly' => null,
+		'validusername' => null,
+		'username' => null,
+		'email' => null,
+		'nospaces' => null
 	];
 
 	public static function addError($field, $error)
@@ -46,61 +46,61 @@ class Form
 	protected static function rules()
 	{
 		$rules = [
-			"required" => function ($field, $value) {
-				if (($value == "" || $value == null)) {
+			'required' => function ($field, $value) {
+				if (($value == '' || $value == null)) {
 					static::$errorsArray[$field] = "$field is required";
 					return false;
 				}
 			},
-			"number" => function ($field, $value) {
-				if (($value == "" || $value == null || !preg_match('/^[0-9]+$/', $value))) {
+			'number' => function ($field, $value) {
+				if (($value == '' || $value == null || !preg_match('/^[0-9]+$/', $value))) {
 					static::$errorsArray[$field] = "$field must only contain numbers";
 					return false;
 				}
 			},
-			"text" => function ($field, $value) {
-				if (($value == "" || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
+			'text' => function ($field, $value) {
+				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
 					static::$errorsArray[$field] = "$field must only contain text and spaces";
 					return false;
 				}
 			},
-			"textonly" => function ($field, $value) {
-				if (($value == "" || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
+			'textonly' => function ($field, $value) {
+				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
 					static::$errorsArray[$field] = "$field must only contain text";
 					return false;
 				}
 			},
-			"validusername" => function ($field, $value) {
-				if (($value == "" || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
-					static::$errorsArray[$field] = $field . " must only contain characters 0-9, A-Z and _";
-					return false;
-				}
-			},
-			"username" => function ($field, $value) {
-				if (($value == "" || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
+			'validusername' => function ($field, $value) {
+				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
 					static::$errorsArray[$field] = "$field must only contain characters 0-9, A-Z and _";
 					return false;
 				}
 			},
-			"email" => function ($field, $value) {
-				if (($value == "" || $value == null || !!filter_var($value, 274) == false)) {
+			'username' => function ($field, $value) {
+				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
+					static::$errorsArray[$field] = "$field must only contain characters 0-9, A-Z and _";
+					return false;
+				}
+			},
+			'email' => function ($field, $value) {
+				if (($value == '' || $value == null || !!filter_var($value, 274) == false)) {
 					static::$errorsArray[$field] = "$field must be a valid email";
 					return false;
 				}
 			},
-			"nospaces" => function ($field, $value) {
-				if (($value == "" || $value == null || !preg_match('/^[ ]+$/', $value))) {
+			'nospaces' => function ($field, $value) {
+				if (($value == '' || $value == null || !preg_match('/^[ ]+$/', $value))) {
 					static::$errorsArray[$field] = "$field can't contain any spaces";
 					return false;
 				}
 			},
-			"max" => function ($field, $value, $params) {
+			'max' => function ($field, $value, $params) {
 				if (strlen($value) > $params) {
 					static::$errorsArray[$field] = "$field can't be more than $params characters";
 					return false;
 				}
 			},
-			"min" => function ($field, $value, $params) {
+			'min' => function ($field, $value, $params) {
 				if (strlen($value) < $params) {
 					static::$errorsArray[$field] = "$field can't be less than $params characters";
 					return false;
@@ -116,7 +116,7 @@ class Form
 	 */
 	protected static function applyRule($rule)
 	{
-		$rulePart = explode(":", $rule);
+		$rulePart = explode(':', $rule);
 		$mainRule = $rulePart[0];
 
 		$supportedRules = static::supportedRules();
@@ -186,18 +186,18 @@ class Form
 		$fields = [];
 
 		foreach ($rules as $param => $rule) {
-			$fields[] = ["name" => $param, "value" => Request::get($param), "rule" => $rule];
+			$fields[] = ['name' => $param, 'value' => Request::get($param), 'rule' => $rule];
 		}
 
 		foreach ($fields as $field) {
-			if (is_array($field["rule"])) {
-				foreach ($field["rule"] as $rule) {
+			if (is_array($field['rule'])) {
+				foreach ($field['rule'] as $rule) {
 					$rule = strtolower($rule);
-					static::validateField($field["name"], $field["value"], $rule);
+					static::validateField($field['name'], $field['value'], $rule);
 				}
 			} else {
-				$field["rule"] = strtolower($field["rule"]);
-				static::validateField($field["name"], $field["value"], $field["rule"]);
+				$field['rule'] = strtolower($field['rule']);
+				static::validateField($field['name'], $field['value'], $field['rule']);
 			}
 		}
 
@@ -217,18 +217,18 @@ class Form
 		$fields = [];
 
 		foreach ($rules as $param => $rule) {
-			$fields[] = ["name" => $param, "value" => $param, "rule" => $rule];
+			$fields[] = ['name' => $param, 'value' => $param, 'rule' => $rule];
 		}
 
 		foreach ($fields as $field) {
-			if (is_array($field["rule"])) {
-				foreach ($field["rule"] as $rule) {
+			if (is_array($field['rule'])) {
+				foreach ($field['rule'] as $rule) {
 					$rule = strtolower($rule);	
-					return static::validateField($field["name"], $field["value"], $rule);
+					return static::validateField($field['name'], $field['value'], $rule);
 				}
 			} else {
-				$field["rule"] = strtolower($field["rule"]);
-				return static::validateField($field["name"], $field["value"], $field["rule"]);
+				$field['rule'] = strtolower($field['rule']);
+				return static::validateField($field['name'], $field['value'], $field['rule']);
 			}
 		}
 
@@ -264,11 +264,11 @@ class Form
 	}
 
 	/**
-	 * Directly "submit" a form without having to work with any mark-up
+	 * Directly 'submit' a form without having to work with any mark-up
 	 */
 	public static function submit(string $method, string $action, array $fields)
 	{
-		$form_fields = "";
+		$form_fields = '';
 
 		foreach ($fields as $key => $value) {
 			$form_fields = $form_fields . "<input type=\"hidden\" name=\"$key\" value=" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . ">";
