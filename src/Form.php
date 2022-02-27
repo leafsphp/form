@@ -33,7 +33,8 @@ class Form
 		'email' => '{field} must be a valid email',
 		'nospaces' => '{field} can\'t contain any spaces',
 		'max' => '{field} $field can\'t be more than {params} characters',
-		'min' => '{field} $field can\'t be less than {params} characters'
+		'min' => '{field} $field can\'t be less than {params} characters',
+    'date' => '{field} must be a valid date',
 	];
 
 	/**
@@ -50,6 +51,7 @@ class Form
 		'nospaces' => null,
 		'max' => null,
 		'min' => null,
+    'date' => null,
 	];
 
 	public static function addError(string $field, string $error)
@@ -170,6 +172,13 @@ class Form
 						static::parseMessage('min', $field, $value, $params);
 					return false;
 				}
+			},
+			'date' => function ($field, $value) {
+        if (!strtotime($value)) {
+          static::$errorsArray[$field] =
+            static::parseMessage('date', $field, $value);
+          return false;
+        }
 			}
 		];
 
