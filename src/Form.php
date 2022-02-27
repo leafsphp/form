@@ -60,13 +60,18 @@ class Form
 	/**
 	 * Set custom error messages for form validation
 	 * 
-	 * @param array $messages The messages to overide
+	 * @param string|array $messages The messages or rule to overide
+   * @param string $value The message to set if $messages is a string
 	 */
-	public static function messages(array $messages)
+	public static function messages($messages, ?string $value = null)
 	{
-		foreach ($messages as $key => $message) {
-			static::$messages[$key] = $message;
-		}
+		if (is_array($messages)) {
+      foreach ($messages as $key => $message) {
+        static::$messages[$key] = $message;
+      }
+    } else {
+      static::$messages[$messages] = $value;
+    }
 	}
 
 	/**
