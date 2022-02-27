@@ -239,11 +239,11 @@ class Form
 	 * Validate the given request with the given rules.
 	 * 
 	 * @param array|string $params The rules or name of parameter to validate
-   * @param string $rule The validation rule to apply if $params is a string
+   * @param array|string $rules The validation rule(s) to apply if $params is a string
 	 * 
 	 * @return bool
 	 */
-	public static function validate($params, ?string $rule = null): bool
+	public static function validate($params, $rules = null): bool
 	{
 		$fields = [];
 
@@ -259,7 +259,7 @@ class Form
       $fields[] = [
         'name' => $params,
         'value' => (new Request)->get($params),
-        'rule' => $rule
+        'rule' => $rules
       ];
     }
 
