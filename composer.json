@@ -1,32 +1,35 @@
 {
-    "name": "leafs/form",
-    "description": "Leaf PHP form module",
-    "keywords": [
-        "form",
-        "validation",
-        "leaf",
-        "php",
-        "framework"
-    ],
-    "homepage": "https://leafphp.netlify.app/#/",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Michael Darko",
-            "email": "mickdd22@gmail.com",
-            "homepage": "https://mychi.netlify.app",
-            "role": "Developer"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Leaf\\": "src"
-        }
-    },
-    "minimum-stability": "dev",
-	"prefer-stable": true,
-    "require": {
-        "leafs/http": "^1.2"
+  "name": "leafs/form",
+  "description": "Leaf PHP form module",
+  "keywords": [
+    "form",
+    "validation",
+    "leaf",
+    "php",
+    "framework"
+  ],
+  "homepage": "https://leafphp.netlify.app/#/",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Darko",
+      "email": "mickdd22@gmail.com",
+      "homepage": "https://mychi.netlify.app",
+      "role": "Developer"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Leaf\\": "src"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "leafs/http": "^1.2"
+  }
 }
