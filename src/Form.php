@@ -151,7 +151,7 @@ class Form
 				}
 			},
 			'nospaces' => function ($field, $value) {
-				if (($value == '' || $value == null || !preg_match('/^[ ]+$/', $value))) {
+				if ($value !== trim($value) || strpos($value, ' ')) {
 					static::$errorsArray[$field] =
 						static::parseMessage('nospaces', $field, $value);
 					return false;
