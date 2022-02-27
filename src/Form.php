@@ -22,6 +22,22 @@ class Form
 	protected static $errorsArray = [];
 
 	/**
+	 * Array holding all error messages
+	 */
+	protected static $messages = [
+		'required' => '{field} is required',
+		'number' => '{field} must only contain numbers',
+		'text' => '{field} must only contain text and spaces',
+		'textonly' => '{field} must only contain text',
+		'validusername' => '{field} must only contain characters 0-9, A-Z and _',
+		'username' => '{field} must only contain characters 0-9, A-Z and _',
+		'email' => '{field} must be a valid email',
+		'nospaces' => '{field} can\'t contain any spaces',
+		'max' => '{field} $field can\'t be more than {params} characters',
+		'min' => '{field} $field can\'t be less than {params} characters'
+	];
+
+	/**
 	 * Default and registered validation rules
 	 */
 	protected static $rules = [
@@ -32,12 +48,47 @@ class Form
 		'validusername' => null,
 		'username' => null,
 		'email' => null,
-		'nospaces' => null
+		'nospaces' => null,
+		'max' => null,
+		'min' => null,
 	];
 
-	public static function addError($field, $error)
+	public static function addError(string $field, string $error)
 	{
 		static::$errorsArray[$field] = $error;
+	}
+
+	/**
+	 * Set custom error messages for form validation
+	 * 
+	 * @param array $messages The messages to overide
+	 */
+	public static function messages(array $messages)
+	{
+		foreach ($messages as $key => $message) {
+			static::$messages[$key] = $message;
+		}
+	}
+
+	/**
+	 * Parse error messages
+	 * 
+	 * @param string $key The rule to evaluate
+	 * @param string $field The name of the field to check
+	 * @param string $value The value of the field to check
+	 * @param string $params Params passed to the current rule
+	 */
+	public static function parseMessage(
+		string $key,
+		string $field,
+		string $value,
+		string $params = null
+	): string {
+		return str_replace(
+			['{field}', '{value}', '{params}'],
+			[$field, $value, $params],
+			static::$messages[$key]
+		);
 	}
 
 	/**
@@ -48,66 +99,76 @@ class Form
 		$rules = [
 			'required' => function ($field, $value) {
 				if (($value == '' || $value == null)) {
-					static::$errorsArray[$field] = "$field is required";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'number' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[0-9]+$/', $value))) {
-					static::$errorsArray[$field] = "$field must only contain numbers";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'text' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
-					static::$errorsArray[$field] = "$field must only contain text and spaces";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'textonly' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
-					static::$errorsArray[$field] = "$field must only contain text";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'validusername' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
-					static::$errorsArray[$field] = "$field must only contain characters 0-9, A-Z and _";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'username' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
-					static::$errorsArray[$field] = "$field must only contain characters 0-9, A-Z and _";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'email' => function ($field, $value) {
 				if (($value == '' || $value == null || !!filter_var($value, 274) == false)) {
-					static::$errorsArray[$field] = "$field must be a valid email";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'nospaces' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[ ]+$/', $value))) {
-					static::$errorsArray[$field] = "$field can't contain any spaces";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value);
 					return false;
 				}
 			},
 			'max' => function ($field, $value, $params) {
 				if (strlen($value) > $params) {
-					static::$errorsArray[$field] = "$field can't be more than $params characters";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value, $params);
 					return false;
 				}
 			},
 			'min' => function ($field, $value, $params) {
 				if (strlen($value) < $params) {
-					static::$errorsArray[$field] = "$field can't be less than $params characters";
+					static::$errorsArray[$field] =
+						static::parseMessage('required', $field, $value, $params);
 					return false;
 				}
 			}
 		];
-		
+
 		static::$rules = array_merge(static::$rules, $rules);
 	}
 
@@ -139,7 +200,7 @@ class Form
 	 * This includes default and custom rules.
 	 */
 	public static function supportedRules(): array
-    {
+	{
 		return array_keys(static::$rules);
 	}
 
@@ -163,7 +224,7 @@ class Form
 	 * @return string
 	 */
 	public static function sanitizeInput(string $data): string
-    {
+	{
 		return htmlspecialchars(stripslashes(trim($data)));
 	}
 
@@ -174,9 +235,9 @@ class Form
 	 * @param  array  $messages
 	 * 
 	 * @return bool
-     */
+	 */
 	public static function validate(array $rules, array $messages = []): bool
-    {
+	{
 		$fields = [];
 
 		foreach ($rules as $param => $rule) {
@@ -205,9 +266,9 @@ class Form
 	 * @param  array  $messages
 	 * 
 	 * @return bool
-     */
+	 */
 	public static function validateData(array $rules, array $messages = []): bool
-    {
+	{
 		$fields = [];
 
 		foreach ($rules as $param => $rule) {
@@ -217,7 +278,7 @@ class Form
 		foreach ($fields as $field) {
 			if (is_array($field['rule'])) {
 				foreach ($field['rule'] as $rule) {
-					$rule = strtolower($rule);	
+					$rule = strtolower($rule);
 					return static::validateField($field['name'], $field['value'], $rule);
 				}
 			} else {
@@ -226,7 +287,7 @@ class Form
 			}
 		}
 
-        return false;
+		return false;
 	}
 
 	/**
@@ -237,13 +298,13 @@ class Form
 	 * @param string $rule The rule to apply
 	 */
 	public static function validateField(string $fieldName, string $fieldValue, string $rule): bool
-    {
+	{
 		static::rules();
 
 		$isValid = true;
 
 		$data = static::applyRule($rule);
-		
+
 		if (is_array($data)) {
 			$data = $data[0]($fieldName, $fieldValue, $data[1] ?? null);
 		} else {
@@ -275,7 +336,7 @@ class Form
 	}
 
 	public static function isEmail($value): bool
-    {
+	{
 		return !!filter_var($value, 274);
 	}
 
@@ -305,7 +366,7 @@ class Form
 	 * @return array
 	 */
 	public static function errors(): array
-    {
+	{
 		return static::$errorsArray;
 	}
 }
