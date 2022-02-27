@@ -205,6 +205,9 @@ class Form
 
 	/**
 	 * Define custom rules
+   * 
+   * @param string|array The rules or name of the rule to define
+   * @param callable|null The handler for rule if $name is a string
 	 */
 	public static function rule($name, $handler = null)
 	{
@@ -230,18 +233,30 @@ class Form
 	/**
 	 * Validate the given request with the given rules.
 	 * 
-	 * @param  array  $rules
-	 * @param  array  $messages
+	 * @param array|string $params The rules or name of parameter to validate
+   * @param string $rule The validation rule to apply if $params is a string
 	 * 
 	 * @return bool
 	 */
-	public static function validate(array $rules, array $messages = []): bool
+	public static function validate($params, ?string $rule = null): bool
 	{
 		$fields = [];
 
-		foreach ($rules as $param => $rule) {
-			$fields[] = ['name' => $param, 'value' => (new Request)->get($param), 'rule' => $rule];
-		}
+		if (is_array($params)) {
+      foreach ($params as $param => $rule) {
+        $fields[] = [
+          'name' => $param,
+          'value' => (new Request)->get($param),
+          'rule' => $rule
+        ];
+      }
+    } else {
+      $fields[] = [
+        'name' => $params,
+        'value' => (new Request)->get($params),
+        'rule' => $rule
+      ];
+    }
 
 		foreach ($fields as $field) {
 			if (is_array($field['rule'])) {
