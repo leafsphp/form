@@ -30,7 +30,6 @@ class Form
 		'text' => '{field} must only contain text and spaces',
 		'textonly' => '{field} must only contain text',
 		'validusername' => '{field} must only contain characters 0-9, A-Z and _',
-		'username' => '{field} must only contain characters 0-9, A-Z and _',
 		'email' => '{field} must be a valid email',
 		'nospaces' => '{field} can\'t contain any spaces',
 		'max' => '{field} $field can\'t be more than {params} characters',
@@ -107,63 +106,63 @@ class Form
 			'number' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[0-9]+$/', $value))) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('number', $field, $value);
 					return false;
 				}
 			},
 			'text' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('text', $field, $value);
 					return false;
 				}
 			},
 			'textonly' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('textonly', $field, $value);
 					return false;
 				}
 			},
 			'validusername' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('validusername', $field, $value);
 					return false;
 				}
 			},
 			'username' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('validusername', $field, $value);
 					return false;
 				}
 			},
 			'email' => function ($field, $value) {
 				if (($value == '' || $value == null || !!filter_var($value, 274) == false)) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('email', $field, $value);
 					return false;
 				}
 			},
 			'nospaces' => function ($field, $value) {
 				if (($value == '' || $value == null || !preg_match('/^[ ]+$/', $value))) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value);
+						static::parseMessage('nospaces', $field, $value);
 					return false;
 				}
 			},
 			'max' => function ($field, $value, $params) {
 				if (strlen($value) > $params) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value, $params);
+						static::parseMessage('max', $field, $value, $params);
 					return false;
 				}
 			},
 			'min' => function ($field, $value, $params) {
 				if (strlen($value) < $params) {
 					static::$errorsArray[$field] =
-						static::parseMessage('required', $field, $value, $params);
+						static::parseMessage('min', $field, $value, $params);
 					return false;
 				}
 			}
