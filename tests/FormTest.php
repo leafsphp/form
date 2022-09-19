@@ -4,21 +4,21 @@ declare(strict_types=1);
 use Leaf\Form;
 
 it("supports 11 default rules", function () {
-  $rules = Form::supportedRules();
-  expect($rules)->toBeArray();
-  expect(count($rules))->toBe(11);
+  expect(Form::supportedRules())
+    ->toBeArray()
+    ->toHaveCount(11);
 });
 
 it("has some known default rules", function () {
-  $rules = Form::supportedRules();
-  expect(in_array('required', $rules))->toBe(true);
-  expect(in_array('email', $rules))->toBe(true);
+  expect(Form::supportedRules())
+    ->toContain('required')
+    ->toContain('email');
 });
 
 it("can add a custom rule", function () {
   $rules = Form::supportedRules();
   $rules_count = count($rules);
-  expect(in_array('custom_equal_rule', $rules))->toBe(false);
+  expect($rules)->not()->toContain('custom_equal_rule');
 
   Form::rule("custom_equal_rule", function ($field, $value, $params) {
     return $value == $params;
@@ -26,7 +26,7 @@ it("can add a custom rule", function () {
 
   $rules = Form::supportedRules();
   $new_rules_count = count($rules);
-  expect(in_array('custom_equal_rule', $rules))->toBe(true);
+  expect($rules)->toContain('custom_equal_rule');
   expect($new_rules_count)->toBe($rules_count + 1);
 });
 
