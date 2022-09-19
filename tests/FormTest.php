@@ -41,3 +41,16 @@ it("executes a custom rule", function () {
     ->toBe(false);
 });
 
+it("returns a custom error message", function () {
+  Form::rule("custom_equal_rule", function ($field, $value, $params) {
+    if ($value != $params) {
+      Form::addError($field, "This {field} did not work. {value} is not equal to {params}");
+      return false;
+    }
+    return true;
+  });
+
+  expect(Form::validateField("test", "wrong", "custom_equal_rule:example"))
+    ->toBe(false);
+  expect(Form::errors())->toHaveKey("test");
+});
