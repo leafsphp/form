@@ -2,3 +2,8 @@ test
 Experimental
 vendor
 composer.lock
+composer
+.phpunit.result.cache
+
+#phpstorm
+.idea
