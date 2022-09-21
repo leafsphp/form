@@ -3,7 +3,7 @@
 if (!function_exists('form') && class_exists('Leaf\App')) {
     /**
      * Return leaf form object
-     * 
+     *
      * @return Leaf\Form
      */
     function form()
