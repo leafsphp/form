@@ -31,5 +31,14 @@
   "prefer-stable": true,
   "require": {
     "leafs/http": "*"
+  },
+  "require-dev": {
+    "pestphp/pest": "^1.22",
+    "friendsofphp/php-cs-fixer": "^3.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }
