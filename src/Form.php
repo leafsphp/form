@@ -34,7 +34,7 @@ class Form
         'nospaces' => '{field} can\'t contain any spaces',
         'max' => '{field} $field can\'t be more than {params} characters',
         'min' => '{field} $field can\'t be less than {params} characters',
-    'date' => '{field} must be a valid date',
+        'date' => '{field} must be a valid date',
     ];
 
     /**
@@ -51,7 +51,7 @@ class Form
         'nospaces' => null,
         'max' => null,
         'min' => null,
-    'date' => null,
+        'date' => null,
     ];
 
     public static function addError(string $field, string $error)
@@ -63,7 +63,7 @@ class Form
      * Set custom error messages for form validation
      *
      * @param string|array $messages The messages or rule to overide
-   * @param string $value The message to set if $messages is a string
+     * @param string $value The message to set if $messages is a string
      */
     public static function messages($messages, ?string $value = null)
     {
@@ -230,9 +230,9 @@ class Form
 
     /**
      * Define custom rules
-   *
-   * @param string|array The rules or name of the rule to define
-   * @param callable|null The handler for rule if $name is a string
+     *
+     * @param string|array  $name  The rules or name of the rule to define
+     * @param callable|null  $handler  The handler for rule if $name is a string
      */
     public static function rule($name, $handler = null)
     {
@@ -259,7 +259,7 @@ class Form
      * Validate the given request with the given rules.
      *
      * @param array|string $params The rules or name of parameter to validate
-   * @param array|string $rules The validation rule(s) to apply if $params is a string
+     * @param array|string $rules The validation rule(s) to apply if $params is a string
      *
      * @return bool
      */
