@@ -32,8 +32,8 @@ class Form
         'validusername' => '{field} must only contain characters 0-9, A-Z and _',
         'email' => '{field} must be a valid email',
         'nospaces' => '{field} can\'t contain any spaces',
-        'max' => '{field} $field can\'t be more than {params} characters',
-        'min' => '{field} $field can\'t be less than {params} characters',
+        'max' => '{field} can\'t be more than {params} characters',
+        'min' => '{field} can\'t be less than {params} characters',
         'date' => '{field} must be a valid date',
     ];
 
