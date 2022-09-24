@@ -110,6 +110,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'number' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[0-9]+$/', $value))) {
@@ -118,6 +121,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'text' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
@@ -126,6 +132,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'textonly' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
@@ -134,6 +143,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'validusername' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
@@ -142,6 +154,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'username' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
@@ -150,6 +165,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'email' => function ($field, $value) {
                 if (($value == '' || $value == null || !!filter_var($value, 274) == false)) {
@@ -158,6 +176,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'nospaces' => function ($field, $value) {
                 if ($value !== trim($value) || strpos($value, ' ')) {
@@ -166,6 +187,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'max' => function ($field, $value, $params) {
                 if (strlen($value) > $params) {
@@ -174,6 +198,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'min' => function ($field, $value, $params) {
                 if (strlen($value) < $params) {
@@ -182,6 +209,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'date' => function ($field, $value) {
                 if (!strtotime($value)) {
@@ -190,6 +220,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
         ];
 
