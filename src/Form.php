@@ -32,9 +32,9 @@ class Form
         'validusername' => '{field} must only contain characters 0-9, A-Z and _',
         'email' => '{field} must be a valid email',
         'nospaces' => '{field} can\'t contain any spaces',
-        'max' => '{field} $field can\'t be more than {params} characters',
-        'min' => '{field} $field can\'t be less than {params} characters',
-    'date' => '{field} must be a valid date',
+        'max' => '{field} can\'t be more than {params} characters',
+        'min' => '{field} can\'t be less than {params} characters',
+        'date' => '{field} must be a valid date',
     ];
 
     /**
@@ -51,7 +51,7 @@ class Form
         'nospaces' => null,
         'max' => null,
         'min' => null,
-    'date' => null,
+        'date' => null,
     ];
 
     public static function addError(string $field, string $error)
@@ -63,7 +63,7 @@ class Form
      * Set custom error messages for form validation
      *
      * @param string|array $messages The messages or rule to overide
-   * @param string $value The message to set if $messages is a string
+     * @param string $value The message to set if $messages is a string
      */
     public static function messages($messages, ?string $value = null)
     {
@@ -110,6 +110,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'number' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[0-9]+$/', $value))) {
@@ -118,6 +121,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'text' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
@@ -126,6 +132,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'textonly' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
@@ -134,6 +143,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'validusername' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
@@ -142,6 +154,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'username' => function ($field, $value) {
                 if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
@@ -150,6 +165,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'email' => function ($field, $value) {
                 if (($value == '' || $value == null || !!filter_var($value, 274) == false)) {
@@ -158,6 +176,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'nospaces' => function ($field, $value) {
                 if ($value !== trim($value) || strpos($value, ' ')) {
@@ -166,6 +187,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'max' => function ($field, $value, $params) {
                 if (strlen($value) > $params) {
@@ -174,6 +198,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'min' => function ($field, $value, $params) {
                 if (strlen($value) < $params) {
@@ -182,6 +209,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
             'date' => function ($field, $value) {
                 if (!strtotime($value)) {
@@ -190,6 +220,9 @@ class Form
 
                     return false;
                 }
+                unset(static::$errorsArray[$field]);
+
+                return true;
             },
         ];
 
@@ -230,9 +263,9 @@ class Form
 
     /**
      * Define custom rules
-   *
-   * @param string|array The rules or name of the rule to define
-   * @param callable|null The handler for rule if $name is a string
+     *
+     * @param string|array  $name  The rules or name of the rule to define
+     * @param callable|null  $handler  The handler for rule if $name is a string
      */
     public static function rule($name, $handler = null)
     {
@@ -259,7 +292,7 @@ class Form
      * Validate the given request with the given rules.
      *
      * @param array|string $params The rules or name of parameter to validate
-   * @param array|string $rules The validation rule(s) to apply if $params is a string
+     * @param array|string $rules The validation rule(s) to apply if $params is a string
      *
      * @return bool
      */
