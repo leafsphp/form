@@ -123,7 +123,6 @@ it("validates the rule 'textonly' for correct values", function ($value) {
   "CAPS",
   "lower",
   "under_score",
-  " ",
 ]);
 
 it("validates the rule 'textonly' for wrong values", function ($value) {
