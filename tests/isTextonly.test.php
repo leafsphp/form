@@ -5,9 +5,9 @@ declare(strict_types=1);
 use Leaf\Form;
 
 test("validates the rule 'textonly' for correct values", function ($value) {
-  expect(Form::validateField("test", $value, "textonly"))
-    ->toBe(true);
-  expect(Form::errors())->not->toHaveKey("test");
+    expect(Form::validateField("test", $value, "textonly"))
+      ->toBe(true);
+    expect(Form::errors())->not->toHaveKey("test");
 })->with([
   "Lorem",
   "CAPS",
@@ -16,10 +16,10 @@ test("validates the rule 'textonly' for correct values", function ($value) {
 ]);
 
 test("validates the rule 'textonly' for wrong values", function ($value) {
-  expect(Form::validateField("test", $value, "textonly"))
-    ->toBe(false);
-  expect(Form::errors())->toHaveKey("test");
-  expect(Form::errors()["test"])->toBe("test must only contain text");
+    expect(Form::validateField("test", $value, "textonly"))
+      ->toBe(false);
+    expect(Form::errors())->toHaveKey("test");
+    expect(Form::errors()["test"])->toBe("test must only contain text");
 })->with([
   "",
   " ",
