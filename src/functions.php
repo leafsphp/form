@@ -8,10 +8,10 @@ if (!function_exists('form') && class_exists('Leaf\App')) {
      */
     function form()
     {
-        if (!(\Leaf\Config::get("form.instance"))) {
-            \Leaf\Config::set("form.instance", new \Leaf\Form());
+        if (!(\Leaf\Config::get('form.instance'))) {
+            \Leaf\Config::set('form.instance', new \Leaf\Form());
         }
 
-        return \Leaf\Config::get("form.instance");
+        return \Leaf\Config::get('form.instance');
     }
 }
