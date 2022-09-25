@@ -214,10 +214,9 @@ class Form
         return true;
       },
       'date' => function ($field, $value) {
-        if (!strtotime($value)) {
+        if ((is_string($value) && strpos($value, ' ') !== false && strpos(trim($value), ' ') === false) || !strtotime($value)) {
           static::$errorsArray[$field] =
             static::parseMessage('date', $field, $value);
-
           return false;
         }
         unset(static::$errorsArray[$field]);
