@@ -62,8 +62,8 @@ class Form
     /**
      * Set custom error messages for form validation
      *
-     * @param string|array $messages The messages or rule to overide
-     * @param string $value The message to set if $messages is a string
+     * @param  string|array  $messages  The messages or rule to override
+     * @param  string|null  $value  The message to set if $messages is a string
      */
     public static function messages($messages, ?string $value = null)
     {
@@ -72,6 +72,9 @@ class Form
                 static::$messages[$key] = $message;
             }
         } else {
+            if (empty($value)) {
+                trigger_error("The message provided for '$messages' is empty.", E_USER_WARNING);
+            }
             static::$messages[$messages] = $value;
         }
     }
