@@ -52,3 +52,14 @@ test('use custom error messages (array) for built-in rules', function () {
 test('check if the given rule is supported', function () {
     Form::validateField('test', 'wrong', 'rule-does-not-exist');
 })->throws(\Whoops\Exception\ErrorException::class);
+
+test('ensure sanitation of input', function ($input, $expected) {
+    expect(Form::sanitizeInput($input))->toBe($expected);
+})->with([
+  ['this should be unchanged', 'this should be unchanged'],
+  ['      ', ''],
+  ['  space around  ', 'space around'],
+  ['<strong>LeafPHP</strong>', '&lt;strong&gt;LeafPHP&lt;/strong&gt;'],
+  ["\\\\This works.", "\\This works."],
+  ["Foo\\'bar", "Foo&#039;bar"],
+]);
