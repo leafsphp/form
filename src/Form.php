@@ -280,7 +280,11 @@ class Form
     }
 
     /**
-     * make sure that the form data is safe to work with
+     * Make sure that the form data is safe to work with.
+     *
+     * Specify the flags and encoding for htmlspecialchars(),
+     * because the default flags have changed in PHP 8.1.
+     * @see https://www.php.net/manual/en/function.htmlspecialchars.php
      *
      * @param string $data The data gotten from the form field
      *
@@ -288,7 +292,7 @@ class Form
      */
     public static function sanitizeInput(string $data): string
     {
-        return htmlspecialchars(stripslashes(trim($data)));
+        return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
     }
 
     /**
