@@ -338,11 +338,10 @@ class Form
      * Validate data.
      *
      * @param  array  $rules The data to be validated, plus rules
-     * @param  array  $messages
      *
      * @return bool
      */
-    public static function validateData(array $rules, array $messages = []): bool
+    public static function validateData(array $rules): bool
     {
         $fields = [];
 
