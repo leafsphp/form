@@ -22,14 +22,14 @@ test('use custom error message (string) for built-in rules', function () {
     expect(Form::validateField('test', 'wrong', 'number'))
       ->toBe(false);
     expect(Form::errors())->toHaveKey('test');
-    expect(Form::errors()['test'] ?? '')->toBe('test must only contain numbers');
+    expect(Form::errors()['test'])->toBe('test must only contain numbers');
 
     Form::messages('number', 'Please make sure that {field} contains a number.');
 
     expect(Form::validateField('test', 'wrong', 'number'))
       ->toBe(false);
     expect(Form::errors())->toHaveKey('test');
-    expect(Form::errors()['test'] ?? '')->toBe('Please make sure that test contains a number.');
+    expect(Form::errors()['test'])->toBe('Please make sure that test contains a number.');
 });
 
 test('use custom error messages (array) for built-in rules', function () {
@@ -41,12 +41,12 @@ test('use custom error messages (array) for built-in rules', function () {
     expect(Form::validateField('test', 'wrong', 'number'))
       ->toBe(false);
     expect(Form::errors())->toHaveKey('test');
-    expect(Form::errors()['test'] ?? '')->toBe('test has a custom message');
+    expect(Form::errors()['test'])->toBe('test has a custom message');
 
     expect(Form::validateField('test', 'wrong', 'email'))
       ->toBe(false);
     expect(Form::errors())->toHaveKey('test');
-    expect(Form::errors()['test'] ?? '')->toBe('test also has a custom message');
+    expect(Form::errors()['test'])->toBe('test also has a custom message');
 });
 
 test('check if the given rule is supported', function () {
