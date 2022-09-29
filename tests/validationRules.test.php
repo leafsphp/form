@@ -48,3 +48,7 @@ test('use custom error messages (array) for built-in rules', function () {
     expect(Form::errors())->toHaveKey('test');
     expect(Form::errors()['test'] ?? '')->toBe('test also has a custom message');
 });
+
+test('check if the given rule is supported', function () {
+    Form::validateField('test', 'wrong', 'rule-does-not-exist');
+})->throws(\Whoops\Exception\ErrorException::class);
