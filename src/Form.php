@@ -62,8 +62,8 @@ class Form
     /**
      * Set custom error messages for form validation
      *
-     * @param string|array $messages The messages or rule to overide
-     * @param string $value The message to set if $messages is a string
+     * @param  string|array  $messages  The messages or rule to override
+     * @param  string|null  $value  The message to set if $messages is a string
      */
     public static function messages($messages, ?string $value = null)
     {
@@ -72,6 +72,9 @@ class Form
                 static::$messages[$key] = $message;
             }
         } else {
+            if (empty($value)) {
+                trigger_error("The message provided for '$messages' is empty.", E_USER_WARNING);
+            }
             static::$messages[$messages] = $value;
         }
     }
@@ -277,7 +280,11 @@ class Form
     }
 
     /**
-     * make sure that the form data is safe to work with
+     * Make sure that the form data is safe to work with.
+     *
+     * Specify the flags and encoding for htmlspecialchars(),
+     * because the default flags have changed in PHP 8.1.
+     * @see https://www.php.net/manual/en/function.htmlspecialchars.php
      *
      * @param string $data The data gotten from the form field
      *
@@ -285,7 +292,7 @@ class Form
      */
     public static function sanitizeInput(string $data): string
     {
-        return htmlspecialchars(stripslashes(trim($data)));
+        return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -335,11 +342,10 @@ class Form
      * Validate data.
      *
      * @param  array  $rules The data to be validated, plus rules
-     * @param  array  $messages
      *
      * @return bool
      */
-    public static function validateData(array $rules, array $messages = []): bool
+    public static function validateData(array $rules): bool
     {
         $fields = [];
 
