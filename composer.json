@@ -1,6 +1,6 @@
 {
   "name": "leafs/form",
-  "description": "Leaf PHP form module",
+  "description": "Simple straightup data validation",
   "keywords": [
     "form",
     "validation",
@@ -30,9 +30,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^7.4|^8.0",
-    "ext-json": "*",
-    "leafs/http": "*"
+    "ext-json": "*"
   },
   "require-dev": {
     "pestphp/pest": "^1.22",
