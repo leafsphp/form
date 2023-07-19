@@ -4,448 +4,271 @@ declare(strict_types=1);
 
 namespace Leaf;
 
-use Leaf\Http\Request;
-
 /**
- * Leaf Forms
- * --------
- * Simple Form Validation with Leaf.
- *
- * @since v1.0
- * @author Michael Darko <mickd22@gmail.com>
+ * Leaf Form
+ * ----
+ * Leaf's form validation library
+ * 
+ * @since 1.0.0
  */
 class Form
 {
-    /**
-     * Array holding all caught errors
-     */
-    protected static $errorsArray = [];
+  /**
+   * Validation errors
+   */
+  protected static $errors = [];
 
-    /**
-     * Array holding all error messages
-     */
-    protected static $messages = [
-      'required' => '{field} is required',
-      'number' => '{field} must only contain numbers',
-      'text' => '{field} must only contain text and spaces',
-      'textonly' => '{field} must only contain text',
-      'validusername' => '{field} must only contain characters 0-9, A-Z and _',
-      'email' => '{field} must be a valid email',
-      'nospaces' => '{field} can\'t contain any spaces',
-      'max' => '{field} can\'t be more than {params} characters',
-      'min' => '{field} can\'t be less than {params} characters',
-      'date' => '{field} must be a valid date',
-    ];
+  /**
+   * Validation rules
+   */
+  protected static $rules = [
+    'required' => '/.+/',
+    'email' => '/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/',
+    'alpha' => '/^[a-zA-Z\s]+$/',
+    'text' => '/^[a-zA-Z\s]+$/',
+    'textOnly' => '/^[a-zA-Z]+$/',
+    'alphaNum' => '/^[a-zA-Z0-9\s]+$/',
+    'alphaDash' => '/^[a-zA-Z0-9-_]+$/',
+    'username' => '/^[a-zA-Z0-9_]+$/',
+    'number' => '/^[0-9]+$/',
+    'float' => '/^[0-9]+(\.[0-9]+)$/',
+    'date' => '/^\d{4}-\d{2}-\d{2}$/',
+    'min' => '/^.{%s,}$/',
+    'max' => '/^.{0,%s}$/',
+    'between' => '/^.{%s,%s}$/',
+    'match' => '/^%s$/',
+    'contains' => '/%s/',
+    'boolean' => '/^(true|false|1|0)$/',
+    'in' => '/^(%s)$/',
+    'ip' => '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/',
+    'ipv4' => '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/',
+    'ipv6' => '/^([a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/',
+    'url' => '/^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?$/i',
+    'domain' => '/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i',
+    'creditCard' => '/^([0-9]{4}-){3}[0-9]{4}$/',
+    'phone' => '/^\+?(\d.*){3,}$/',
+    'uuid' => '/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i',
+    'slug' => '/^[a-z0-9]+(-[a-z0-9]+)*$/i',
+    'json' => '/^[\w\s\-\{\}\[\]\"]+$/',
+    'regex' => '/%s/',
+  ];
 
-    /**
-     * Default and registered validation rules
-     */
-    protected static $rules = [
-      'required' => null,
-      'number' => null,
-      'text' => null,
-      'textonly' => null,
-      'validusername' => null,
-      'username' => null,
-      'email' => null,
-      'nospaces' => null,
-      'max' => null,
-      'min' => null,
-      'date' => null,
-    ];
+  /**
+   * Validation error messages
+   */
+  protected static $messages = [
+    'required' => '{Field} is required',
+    'email' => '{Field} must be a valid email address',
+    'alpha' => '{Field} must contain only alphabets and spaces',
+    'text' => '{Field} must contain only alphabets and spaces',
+    'textOnly' => '{Field} must contain only alphabets',
+    'alphaNum' => '{Field} must contain only alphabets and numbers',
+    'alphaDash' => '{Field} must contain only alphabets, numbers, dashes and underscores',
+    'username' => '{Field} must contain only alphabets, numbers and underscores',
+    'number' => '{Field} must contain only numbers',
+    'float' => '{Field} must contain only numbers',
+    'date' => '{Field} must be a valid date',
+    'min' => '{Field} must be at least %s characters long',
+    'max' => '{Field} must not exceed %s characters',
+    'between' => '{Field} must be between %s and %s characters long',
+    'match' => '{Field} must match the %s field',
+    'contains' => '{Field} must contain %s',
+    'boolean' => '{Field} must be a boolean',
+    'in' => '{Field} must be one of the following: %s',
+    'notIn' => '{Field} must not be one of the following: %s',
+    'ip' => '{Field} must be a valid IP address',
+    'ipv4' => '{Field} must be a valid IPv4 address',
+    'ipv6' => '{Field} must be a valid IPv6 address',
+    'url' => '{Field} must be a valid URL',
+    'domain' => '{Field} must be a valid domain',
+    'creditCard' => '{Field} must be a valid credit card number',
+    'phone' => '{Field} must be a valid phone number',
+    'uuid' => '{Field} must be a valid UUID',
+    'slug' => '{Field} must be a valid slug',
+    'json' => '{Field} must be a valid JSON string',
+    'regex' => '{Field} must match the pattern %s',
+  ];
 
-    public static function addError(string $field, string $error)
-    {
-        static::$errorsArray[$field] = $error;
+  /**
+   * Validate a single rule
+   * 
+   * @param string $rule The rule to validate against
+   * @param mixed $value The value to validate
+   * @param mixed $param The rule parameter
+   * 
+   * @return bool
+   */
+  public static function test(string $rule, $value, $param = null, $field = null): bool
+  {
+    if (!isset(static::$rules[$rule])) {
+      throw new \Exception("Rule $rule does not exist");
     }
 
-    /**
-     * Set custom error messages for form validation
-     *
-     * @param  string|array  $messages  The messages or rule to override
-     * @param  string|null  $value  The message to set if $messages is a string
-     */
-    public static function messages($messages, ?string $value = null)
-    {
-        if (is_array($messages)) {
-            foreach ($messages as $key => $message) {
-                static::$messages[$key] = $message;
-            }
-        } else {
-            if (empty($value)) {
-                trigger_error("The message provided for '$messages' is empty.", E_USER_WARNING);
-            }
-            static::$messages[$messages] = $value;
-        }
+    $param = eval("return $param;");
+
+    if (is_callable(static::$rules[$rule])) {
+      return call_user_func(static::$rules[$rule], $value, $param, $field);
     }
 
-    /**
-     * Parse error messages
-     *
-     * @param string $key The rule to evaluate
-     * @param string $field The name of the field to check
-     * @param string $value The value of the field to check
-     * @param string $params Params passed to the current rule
-     */
-    public static function parseMessage(
-        string $key,
-        string $field,
-        string $value,
-        string $params = null
-    ): string {
-        return str_replace(
-            ['{field}', '{value}', '{params}'],
-            [$field, $value, $params],
-            static::$messages[$key]
-        );
+    if (!is_array($param)) {
+      $param = [$param];
     }
 
-    /**
-     * Load default rules
-     */
-    protected static function rules()
-    {
-        $rules = [
-          'required' => function ($field, $value) {
-              if (($value == '' || $value == null)) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('required', $field, $value);
+    return filter_var(
+      preg_match(sprintf(static::$rules[$rule], ...$param), "$value"),
+      FILTER_VALIDATE_BOOLEAN
+    );
+  }
 
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
+  /**
+   * Validate form data
+   * 
+   * @param array $data The data to validate
+   * @param array $rules The rules to validate against
+   * 
+   * @return bool
+   */
+  public static function validate(array $data, array $rules): bool
+  {
+    $success = true;
 
-              return true;
-          },
-          'number' => function ($field, $value) {
-              if (($value == '' || $value == null || !preg_match('/^[0-9]+$/', $value))) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('number', $field, $value);
+    foreach ($rules as $field => $userRules) {
+      if (is_string($userRules)) {
+        $userRules = explode('|', $userRules);
+      }
 
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
+      foreach ($userRules as $rule) {
+        if (empty($rule)) {
+          continue;
+        }
 
-              return true;
-          },
-          'text' => function ($field, $value) {
-              if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z ]+$/', $value))) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('text', $field, $value);
+        $rule = explode(':', $rule);
+        $rule[0] = trim($rule[0]);
 
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
+        if (count($rule) > 1) {
+          $rule[1] = trim($rule[1]);
+        }
 
-              return true;
-          },
-          'textonly' => function ($field, $value) {
-              if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z]+$/', $value))) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('textonly', $field, $value);
+        $value = $data[$field] ?? null;
 
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
+        if (!static::test($rule[0], $value, $rule[1] ?? null, $field)) {
+          $params = $rule[1] ?? null;
+          $params = eval("return $params;");
 
-              return true;
-          },
-          'validusername' => function ($field, $value) {
-              if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('validusername', $field, $value);
+          if (!is_array($params)) {
+            $params = [$params];
+          }
 
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-          'username' => function ($field, $value) {
-              if (($value == '' || $value == null || !preg_match('/^[_a-zA-Z0-9]+$/', $value))) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('validusername', $field, $value);
-
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-          'email' => function ($field, $value) {
-              if (($value == '' || $value == null || !!filter_var($value, 274) == false)) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('email', $field, $value);
-
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-          'nospaces' => function ($field, $value) {
-              if ($value !== trim($value) || strpos($value, ' ')) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('nospaces', $field, $value);
-
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-          'max' => function ($field, $value, $params) {
-              if (strlen($value) > $params) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('max', $field, $value, $params);
-
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-          'min' => function ($field, $value, $params) {
-              if (strlen($value) < $params) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('min', $field, $value, $params);
-
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-          'date' => function ($field, $value) {
-              if ((is_string($value) && strpos($value, ' ') !== false && strpos(trim($value), ' ') === false) || !strtotime($value)) {
-                  static::$errorsArray[$field] =
-                    static::parseMessage('date', $field, $value);
-
-                  return false;
-              }
-              unset(static::$errorsArray[$field]);
-
-              return true;
-          },
-        ];
-
-        static::$rules = array_merge(static::$rules, $rules);
+          $errorMessage = str_replace(
+            ['{field}', '{Field}', '{value}'],
+            [$field, ucfirst($field), $value],
+            static::$messages[$rule[0]] ?? '{Field} is invalid!'
+          );
+          static::addError($field, sprintf($errorMessage, ...$params));
+          $success = false;
+        }
+      }
     }
 
-    /**
-     * Apply a form rule
-     */
-    protected static function applyRule($rule)
-    {
-        $rulePart = explode(':', $rule);
-        $mainRule = $rulePart[0];
+    return $success;
+  }
 
-        $supportedRules = static::supportedRules();
+  /**
+   * Add custom validation rule
+   * @param string $name The name of the rule
+   * @param string|callable $handler The rule handler
+   * @param string|null $message The error message
+   */
+  public static function addRule(string $name, $handler, ?string $message = null)
+  {
+    static::$rules[$name] = $handler;
+    static::$messages[$name] = $message ?? "%s is invalid!";
+  }
 
-        if (!in_array($mainRule, $supportedRules)) {
-            trigger_error("$mainRule is not a supported rule. Supported rules are " . json_encode($supportedRules));
-        }
+  /**
+   * Alias for addRule
+   * @param string $name The name of the rule
+   * @param string|callable $handler The rule handler
+   * @param string|null $message The error message
+   */
+  public static function rule(string $name, $handler, ?string $message = null)
+  {
+    static::addRule($name, $handler, $message);
+  }
 
-        $formRule = static::$rules[$mainRule];
-
-        if (count($rulePart) > 1) {
-            return [$formRule, $rulePart[1]];
-        }
-
-        return $formRule;
+  /**
+   * Add validation error message
+   * @param string|array $field The field to add the message to
+   * @param string|null $message The error message if $field is a string
+   */
+  public static function addMessage($field, ?string $message = null)
+  {
+    if (is_array($field)) {
+      foreach ($field as $key => $value) {
+        static::$messages[$key] = $value;
+      }
+      return;
     }
 
-    /**
-     * Get a list of all supported rules.
-     * This includes default and custom rules.
-     */
-    public static function supportedRules(): array
-    {
-        return array_keys(static::$rules);
+    if (!$message) {
+      throw new \Exception("Message cannot be empty");
     }
 
-    /**
-     * Define custom rules
-     *
-     * @param string|array  $name  The rules or name of the rule to define
-     * @param callable|null  $handler  The handler for rule if $name is a string
-     */
-    public static function rule($name, $handler = null)
-    {
-        if (is_array($name)) {
-            static::$rules = array_merge(static::$rules, $name);
-        } else {
-            static::$rules[$name] = $handler;
-        }
+    static::$messages[$field] = $message;
+  }
+
+  /**
+   * Directly 'submit' a form without having to work with any mark-up
+   */
+  public static function submit(string $method, string $action, array $fields)
+  {
+    $form_fields = '';
+
+    foreach ($fields as $key => $value) {
+      $form_fields = $form_fields . "<input type=\"hidden\" name=\"$key\" value=" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . ">";
     }
 
-    /**
-     * Make sure that the form data is safe to work with.
-     *
-     * Specify the flags and encoding for htmlspecialchars(),
-     * because the default flags have changed in PHP 8.1.
-     * @see https://www.php.net/manual/en/function.htmlspecialchars.php
-     *
-     * @param string $data The data gotten from the form field
-     *
-     * @return string
-     */
-    public static function sanitizeInput(string $data): string
-    {
-        return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
-    }
-
-    /**
-     * Validate the given request with the given rules.
-     *
-     * @param array|string $params The rules or name of parameter to validate
-     * @param array|string $rules The validation rule(s) to apply if $params is a string
-     *
-     * @return bool
-     */
-    public static function validate($params, $rules = null): bool
-    {
-        $fields = [];
-
-        if (is_array($params)) {
-            foreach ($params as $param => $rule) {
-                $fields[] = [
-                  'name' => $param,
-                  'value' => (new Request())->get($param),
-                  'rule' => $rule,
-                ];
-            }
-        } else {
-            $fields[] = [
-              'name' => $params,
-              'value' => (new Request())->get($params),
-              'rule' => $rules,
-            ];
-        }
-
-        foreach ($fields as $field) {
-            if (is_array($field['rule'])) {
-                foreach ($field['rule'] as $rule) {
-                    $rule = strtolower($rule);
-                    static::validateField($field['name'], $field['value'], $rule);
-                }
-            } else {
-                $field['rule'] = strtolower($field['rule']);
-                static::validateField($field['name'], $field['value'], $field['rule']);
-            }
-        }
-
-        return (count(static::$errorsArray) === 0);
-    }
-
-    /**
-     * Validate data.
-     *
-     * @param  array  $rules The data to be validated, plus rules
-     *
-     * @return bool
-     */
-    public static function validateData(array $rules): bool
-    {
-        $fields = [];
-
-        foreach ($rules as $param => $rule) {
-            $fields[] = ['name' => $param, 'value' => $param, 'rule' => $rule];
-        }
-
-        foreach ($fields as $field) {
-            if (is_array($field['rule'])) {
-                foreach ($field['rule'] as $rule) {
-                    $rule = strtolower($rule);
-
-                    return static::validateField($field['name'], $field['value'], $rule);
-                }
-            } else {
-                $field['rule'] = strtolower($field['rule']);
-
-                return static::validateField($field['name'], $field['value'], $field['rule']);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Validate field data
-     *
-     * @param string $fieldName The name of the field to validate
-     * @param string $fieldValue The value of the field to validate
-     * @param string $rule The rule to apply
-     */
-    public static function validateField(string $fieldName, string $fieldValue, string $rule): bool
-    {
-        static::rules();
-
-        $isValid = true;
-        $data = static::applyRule($rule);
-
-        if (is_array($data)) {
-            $data = $data[0]($fieldName, $fieldValue, $data[1] ?? null);
-        } else {
-            $data = $data($fieldName, $fieldValue);
-        }
-
-        if ($data === false) {
-            $isValid = false;
-        }
-
-        return $isValid;
-    }
-
-    /**
-     * Directly 'submit' a form without having to work with any mark-up
-     */
-    public static function submit(string $method, string $action, array $fields)
-    {
-        $form_fields = '';
-
-        foreach ($fields as $key => $value) {
-            $form_fields = $form_fields . "<input type=\"hidden\" name=\"$key\" value=" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . ">";
-        }
-
-        echo "
+    echo "
 			<form action=\"$action\" method=\"$method\" id=\"67yeg76tug216tdg267tgd21tuygu\">$form_fields</form>
 			<script>document.getElementById(\"67yeg76tug216tdg267tgd21tuygu\").submit();</script>
 		";
+  }
+
+  public static function isEmail($value): bool
+  {
+    return !!filter_var($value, 274);
+  }
+
+  /**
+   * Alias for addMessage
+   * @param string|array $field The field to add the message to
+   * @param string|null $message The error message if $field is a string
+   */
+  public static function message($field, ?string $message = null)
+  {
+    static::addMessage($field, $message);
+  }
+
+  /**
+   * Add validation error
+   * @param string $field The field that has an error
+   * @param string $error The error message
+   */
+  public static function addError(string $field, string $error)
+  {
+    if (!isset(static::$errors[$field])) {
+      static::$errors[$field] = [];
     }
 
-    public static function isEmail($value): bool
-    {
-        return !!filter_var($value, 274);
-    }
+    array_push(static::$errors[$field], $error);
+  }
 
-    /**
-     * Return the form fields+data
-     *
-     * @return string|array
-     */
-    public static function body()
-    {
-        return (new Request())->body();
-    }
-
-    /**
-     * Return the form fields+data
-     *
-     * @return string|array
-     */
-    public static function get()
-    {
-        return (new Request())->body();
-    }
-
-    /**
-     * Return the form errors
-     *
-     * @return array
-     */
-    public static function errors(): array
-    {
-        return static::$errorsArray;
-    }
+  /**
+   * Get validation errors
+   * @return array
+   */
+  public static function errors(): array
+  {
+    return static::$errors;
+  }
 }
