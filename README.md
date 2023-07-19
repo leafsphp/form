@@ -12,16 +12,43 @@
 [![Total Downloads](https://poser.pugx.org/leafs/form/downloads)](https://packagist.org/packages/leafs/form)
 [![License](https://poser.pugx.org/leafs/form/license)](https://packagist.org/packages/leafs/form)
 
-Leaf's form functionality packaged as a serve-yourself module.
+Leaf's form validation functionality packaged as a serve-yourself module.
 
 ## Installation
 
-You can easily install Leaf using [Composer](https://getcomposer.org/).
+You can easily install Leaf using the Leaf CLI:
+
+```bash
+leaf install form
+```
+
+Or via [Composer](https://getcomposer.org/).
 
 ```bash
 composer require leafs/form
 ```
 
-## View Leaf's docs [here](https://leafphp.netlify.app/#/)
+## Basic Usage
 
-Built with ❤ by [**Mychi Darko**](https://mychi.netlify.app)
+```php
+<?php
+
+$data = [
+  'name' => 'Full Name',
+  'email' => 'example@example.com',
+  'password' => 'password1234',
+];
+
+$success = form()->validate($data, [
+  'name' => 'required',
+  'email' => 'required|email',
+  'password' => 'required|min:8'
+]);
+
+if ($success) {
+  // do something
+} else {
+  // get errors
+  $errors = form()->errors();
+}
+```
