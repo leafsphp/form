@@ -6,7 +6,7 @@ if (!function_exists('form') && class_exists('Leaf\App')) {
      *
      * @return Leaf\Form
      */
-    function form()
+    function form(): \Leaf\Form
     {
         if (!(\Leaf\Config::get('form.instance'))) {
             \Leaf\Config::set('form.instance', new \Leaf\Form());
