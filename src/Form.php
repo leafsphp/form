@@ -126,11 +126,11 @@ class Form
      * @param array $data The data to validate
      * @param array $rules The rules to validate against
      *
-     * @return bool
+     * @return false|array Returns false if validation fails, otherwise returns the validated data
      */
-    public static function validate(array $data, array $rules): bool
+    public static function validate(array $data, array $rules)
     {
-        $success = true;
+        $output = $data;
 
         foreach ($rules as $field => $userRules) {
             if (is_string($userRules)) {
@@ -164,13 +164,15 @@ class Form
                         [$field, ucfirst($field), $value],
                         static::$messages[$rule[0]] ?? '{Field} is invalid!'
                     );
+
                     static::addError($field, sprintf($errorMessage, ...$params));
-                    $success = false;
+
+                    $output = false;
                 }
             }
         }
 
-        return $success;
+        return $output;
     }
 
     /**
