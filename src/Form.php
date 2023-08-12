@@ -214,7 +214,7 @@ class Form
         }
 
         if (!$message) {
-            throw new \Exception("Message cannot be empty");
+            throw new \Exception('Message cannot be empty');
         }
 
         static::$messages[$field] = $message;
@@ -264,6 +264,15 @@ class Form
         }
 
         array_push(static::$errors[$field], $error);
+    }
+
+    /**
+     * Get a list of all supported rules.
+     * @return array
+     */
+    public static function supportedRules(): array
+    {
+        return array_keys(static::$rules);
     }
 
     /**
