@@ -9,9 +9,9 @@ $defaultRules = [
     'email',
     'alpha',
     'text',
-    'textOnly',
-    'alphaNum',
-    'alphaDash',
+    'textonly',
+    'alphanum',
+    'alphadash',
     'username',
     'number',
     'float',
@@ -28,7 +28,7 @@ $defaultRules = [
     'ipv6',
     'url',
     'domain',
-    'creditCard',
+    'creditcard',
     'phone',
     'uuid',
     'slug',
@@ -40,6 +40,13 @@ test('has some known default validation rules', function () use ($defaultRules) 
     expect(Form::supportedRules())->toBe($defaultRules);
 });
 
+test('rules are case-insensitive', function () {
+    $value = 'leafphp';
+    expect(Form::test('alpha', $value))->toBe(true);
+    expect(Form::test('ALPHA', $value))->toBe(true);
+    expect(Form::test('Alpha', $value))->toBe(true);
+});
+
 test('throws error for unsupported rules', function () {
     $value = '';
     expect(Form::test('rule-does-not-exist', $value))->toBe(false);
@@ -47,7 +54,7 @@ test('throws error for unsupported rules', function () {
 
 test('can add custom validation rules', function () {
     Form::addRule('customRule10110', '/^custom$/');
-    expect(Form::supportedRules())->toContain('customRule10110');
+    expect(Form::supportedRules())->toContain('customrule10110');
 });
 
 test('can add custom validation rules with closure', function () {
