@@ -26,9 +26,9 @@ class Form
         'email' => '/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/',
         'alpha' => '/^[a-zA-Z\s]+$/',
         'text' => '/^[a-zA-Z\s]+$/',
-        'textOnly' => '/^[a-zA-Z]+$/',
-        'alphaNum' => '/^[a-zA-Z0-9\s]+$/',
-        'alphaDash' => '/^[a-zA-Z0-9-_]+$/',
+        'textonly' => '/^[a-zA-Z]+$/',
+        'alphanum' => '/^[a-zA-Z0-9\s]+$/',
+        'alphadash' => '/^[a-zA-Z0-9-_]+$/',
         'username' => '/^[a-zA-Z0-9_]+$/',
         'number' => '/^[0-9]+$/',
         'float' => '/^[0-9]+(\.[0-9]+)$/',
@@ -45,7 +45,7 @@ class Form
         'ipv6' => '/^([a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/',
         'url' => '/^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?$/i',
         'domain' => '/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i',
-        'creditCard' => '/^([0-9]{4}-){3}[0-9]{4}$/',
+        'creditcard' => '/^([0-9]{4}-){3}[0-9]{4}$/',
         'phone' => '/^\+?(\d.*){3,}$/',
         'uuid' => '/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i',
         'slug' => '/^[a-z0-9]+(-[a-z0-9]+)*$/i',
@@ -100,6 +100,8 @@ class Form
      */
     public static function test(string $rule, $value, $param = null, $field = null): bool
     {
+        $rule = strtolower($rule);
+
         if (!isset(static::$rules[$rule])) {
             throw new \Exception("Rule $rule does not exist");
         }
@@ -134,7 +136,7 @@ class Form
 
         foreach ($rules as $field => $userRules) {
             if (is_string($userRules)) {
-                $userRules = explode('|', $userRules);
+                $userRules = explode('|', strtolower($userRules));
             }
 
             foreach ($userRules as $rule) {
@@ -183,8 +185,8 @@ class Form
      */
     public static function addRule(string $name, $handler, ?string $message = null)
     {
-        static::$rules[$name] = $handler;
-        static::$messages[$name] = $message ?? "%s is invalid!";
+        static::$rules[strtolower($name)] = $handler;
+        static::$messages[strtolower($name)] = $message ?? "%s is invalid!";
     }
 
     /**
