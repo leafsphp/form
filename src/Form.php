@@ -57,7 +57,7 @@ class Form
      * Special validation rules
      */
     protected static $specialRules = [
-        'array'
+        'array',
     ];
 
     /**
