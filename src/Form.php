@@ -54,6 +54,13 @@ class Form
     ];
 
     /**
+     * Special validation rules
+     */
+    protected static $specialRules = [
+        'array'
+    ];
+
+    /**
      * Validation error messages
      */
     protected static $messages = [
@@ -61,9 +68,9 @@ class Form
         'email' => '{Field} must be a valid email address',
         'alpha' => '{Field} must contain only alphabets and spaces',
         'text' => '{Field} must contain only alphabets and spaces',
-        'textOnly' => '{Field} must contain only alphabets',
-        'alphaNum' => '{Field} must contain only alphabets and numbers',
-        'alphaDash' => '{Field} must contain only alphabets, numbers, dashes and underscores',
+        'textonly' => '{Field} must contain only alphabets',
+        'alphanum' => '{Field} must contain only alphabets and numbers',
+        'alphadash' => '{Field} must contain only alphabets, numbers, dashes and underscores',
         'username' => '{Field} must contain only alphabets, numbers and underscores',
         'number' => '{Field} must contain only numbers',
         'float' => '{Field} must contain only numbers',
@@ -75,18 +82,19 @@ class Form
         'contains' => '{Field} must contain %s',
         'boolean' => '{Field} must be a boolean',
         'in' => '{Field} must be one of the following: %s',
-        'notIn' => '{Field} must not be one of the following: %s',
+        'notin' => '{Field} must not be one of the following: %s',
         'ip' => '{Field} must be a valid IP address',
         'ipv4' => '{Field} must be a valid IPv4 address',
         'ipv6' => '{Field} must be a valid IPv6 address',
         'url' => '{Field} must be a valid URL',
         'domain' => '{Field} must be a valid domain',
-        'creditCard' => '{Field} must be a valid credit card number',
+        'creditcard' => '{Field} must be a valid credit card number',
         'phone' => '{Field} must be a valid phone number',
         'uuid' => '{Field} must be a valid UUID',
         'slug' => '{Field} must be a valid slug',
         'json' => '{Field} must be a valid JSON string',
         'regex' => '{Field} must match the pattern %s',
+        'array' => '{field} must be an array',
     ];
 
     /**
@@ -102,10 +110,38 @@ class Form
     {
         $rule = strtolower($rule);
 
+        if (strpos($rule, '(') !== false) {
+            $ruleData = explode('(', $rule);
+            $rule = $ruleData[0];
+
+            if (in_array($rule, static::$specialRules)) {
+                $params = explode('|', str_replace(['(', ')'], '', $ruleData[1]));
+
+                if ($rule === 'array') {
+                    if (!is_array($value)) {
+                        return false;
+                    }
+
+                    $isValid = true;
+
+                    foreach ($params as $paramValue) {
+                        foreach ($value as $valueArrayItem) {
+                            if (!static::test($paramValue, $valueArrayItem)) {
+                                $isValid = false;
+                            }
+                        }
+                    }
+
+                    return $isValid;
+                }
+            }
+        }
+
         if (!isset(static::$rules[$rule])) {
             throw new \Exception("Rule $rule does not exist");
         }
 
+        $param = is_string($param) ? trim($param, '()') : $param;
         $param = eval("return $param;");
 
         if (is_callable(static::$rules[$rule])) {
@@ -136,7 +172,17 @@ class Form
 
         foreach ($rules as $field => $userRules) {
             if (is_string($userRules)) {
-                $userRules = explode('|', strtolower($userRules));
+                if (strpos($userRules, '(') !== false) {
+                    $pattern = '/(array\([^)]+\))\|(\w+)/';
+
+                    if (preg_match($pattern, $userRules, $matches)) {
+                        $userRules = [$matches[1], ...explode('|', strtolower($matches[2]))];
+                    } else {
+                        $userRules = explode('|', strtolower($userRules));
+                    }
+                } else {
+                    $userRules = explode('|', strtolower($userRules));
+                }
             }
 
             foreach ($userRules as $rule) {
@@ -154,7 +200,7 @@ class Form
                 $value = $data[$field] ?? null;
 
                 if (!static::test($rule[0], $value, $rule[1] ?? null, $field)) {
-                    $params = $rule[1] ?? null;
+                    $params = is_string($rule[1] ?? null) ? trim($rule[1], '()') : ($rule[1] ?? null);
                     $params = eval("return $params;");
 
                     if (!is_array($params)) {
@@ -164,7 +210,7 @@ class Form
                     $errorMessage = str_replace(
                         ['{field}', '{Field}', '{value}'],
                         [$field, ucfirst($field), $value],
-                        static::$messages[$rule[0]] ?? '{Field} is invalid!'
+                        static::$messages[$rule[0]] ?? static::$messages[explode('(', $rule[0])[0] ?? 'any'] ?? '{Field} is invalid!'
                     );
 
                     static::addError($field, sprintf($errorMessage, ...$params));
