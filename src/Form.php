@@ -197,7 +197,7 @@ class Form
                     $rule[1] = trim($rule[1]);
                 }
 
-                $value = $data[$field] ?? null;
+                $value = Form::getDotNotatedValue($data, $field);
 
                 if (!static::test($rule[0], $value, $rule[1] ?? null, $field)) {
                     $params = is_string($rule[1] ?? null) ? trim($rule[1], '()') : ($rule[1] ?? null);
@@ -221,6 +221,24 @@ class Form
         }
 
         return $output;
+    }
+
+    /**
+     * Get the value from a nested array by key.
+     *
+     * @param array $array The array to search in.
+     * @param string $key The key to search for.
+     * @return mixed|null The value if found, null otherwise.
+     */
+    public static function getDotNotatedValue($array, $key) {
+        $keys = explode('.', $key);
+        foreach ($keys as $k) {
+            if (!isset($array[$k])) {
+                return null;
+            }
+            $array = $array[$k];
+        }
+        return $array;
     }
 
     /**
