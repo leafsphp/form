@@ -42,3 +42,21 @@ test('errors are collected on failure', function () {
 
     expect(Form::errors())->toHaveKey('test3');
 });
+
+test('fields can be marked as optional', function () {
+    $itemsToValidate = [];
+
+    $validatedData = Form::validate($itemsToValidate, ['test4' => 'optional|email']);
+
+    expect($validatedData)->toBe($itemsToValidate);
+    expect(Form::errors())->not->toHaveKey('test4');
+});
+
+test('optional fields are validated correctly if provided', function () {
+    $itemsToValidate = ['test5' => ''];
+
+    $validatedData = Form::validate($itemsToValidate, ['test5' => 'optional|email']);
+
+    expect($validatedData)->toBe(false);
+    expect(Form::errors())->toHaveKey('test5');
+});

@@ -187,6 +187,16 @@ class Form
                 }
             }
 
+            if (in_array('optional', $userRules)) {
+                $userRules = array_filter($userRules, function ($rule) {
+                    return $rule !== 'optional';
+                });
+
+                if (!isset($data[$field])) {
+                    continue;
+                }
+            }
+
             foreach ($userRules as $rule) {
                 if (empty($rule)) {
                     continue;
