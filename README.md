@@ -34,13 +34,17 @@ composer require leafs/form
 <?php
 
 $data = [
-  'name' => 'Full Name',
+  'name' => [
+    'first' => 'Jane',
+    'last' => 'Doe',
+  ],
   'email' => 'example@example.com',
   'password' => 'password1234',
 ];
 
 $success = form()->validate($data, [
-  'name' => 'required',
+  'name.first' => 'required',
+  'name.last' => 'required',
   'email' => 'required|email',
   'password' => 'required|min:8'
 ]);
