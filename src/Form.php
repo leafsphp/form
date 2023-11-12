@@ -115,7 +115,7 @@ class Form
             $rule = $ruleData[0];
 
             if (in_array($rule, static::$specialRules)) {
-                $params = explode('|', str_replace(['(', ')'], '', $ruleData[1]));
+                $params = array_filter(explode('|', str_replace(['(', ')'], '', $ruleData[1])));
 
                 if ($rule === 'array') {
                     if (!is_array($value)) {
@@ -124,10 +124,12 @@ class Form
 
                     $isValid = true;
 
-                    foreach ($params as $paramValue) {
-                        foreach ($value as $valueArrayItem) {
-                            if (!static::test($paramValue, $valueArrayItem)) {
-                                $isValid = false;
+                    if (count($params) > 0) {
+                        foreach ($params as $paramValue) {
+                            foreach ($value as $valueArrayItem) {
+                                if (!static::test($paramValue, $valueArrayItem)) {
+                                    $isValid = false;
+                                }
                             }
                         }
                     }
