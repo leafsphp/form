@@ -60,3 +60,12 @@ test('optional fields are validated correctly if provided', function () {
     expect($validatedData)->toBe(false);
     expect(Form::errors())->toHaveKey('test5');
 });
+
+test('optional rule works correctly no matter it\'s position', function () {
+    $itemsToValidate = [];
+
+    $validatedData = Form::validate($itemsToValidate, ['test6' => 'text|email|optional']);
+
+    expect($validatedData)->toBe($itemsToValidate);
+    expect(Form::errors())->not()->toHaveKey('test6');
+});
