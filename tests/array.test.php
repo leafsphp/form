@@ -32,3 +32,26 @@ test('array() can be used to validate array content', function () {
     expect(Form::errors())->toHaveKey('specialItem3');
     expect(Form::errors())->not()->toHaveKey('specialItem4');
 });
+
+test('array() can be used to check if an associative array is an array', function () {
+    $itemsToValidate = ['specialItem5' => ['key' => 'value']];
+
+    Form::validate($itemsToValidate, ['specialItem5' => 'array()']);
+
+    expect(Form::errors())->not()->toHaveKey('specialItem5');
+});
+
+test('associative arrays can be validated using dot notation', function () {
+    $itemsToValidate = [
+        'specialItem6' => [
+            'key' => 'value',
+            'key2' => 'value2',
+        ],
+    ];
+
+    Form::validate($itemsToValidate, ['specialItem6.key' => 'required']);
+    Form::validate($itemsToValidate, ['specialItem6.key2' => 'email']);
+
+    expect(Form::errors())->not()->toHaveKey('specialItem6');
+    expect(Form::errors())->toHaveKey('specialItem6.key2');
+});

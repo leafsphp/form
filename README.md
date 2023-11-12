@@ -6,8 +6,6 @@
   <br><br>
 </p>
 
-# Leaf PHP
-
 [![Latest Stable Version](https://poser.pugx.org/leafs/form/v/stable)](https://packagist.org/packages/leafs/form)
 [![Total Downloads](https://poser.pugx.org/leafs/form/downloads)](https://packagist.org/packages/leafs/form)
 [![License](https://poser.pugx.org/leafs/form/license)](https://packagist.org/packages/leafs/form)
@@ -42,14 +40,15 @@ $data = [
   'password' => 'password1234',
 ];
 
-$success = form()->validate($data, [
+$validated = form()->validate($data, [
+  'name' => 'array()',
   'name.first' => 'required',
   'name.last' => 'required',
   'email' => 'required|email',
   'password' => 'required|min:8'
 ]);
 
-if ($success) {
+if ($validated) {
   // do something
 } else {
   // get errors

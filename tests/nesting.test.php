@@ -24,6 +24,7 @@ test('getDotNotatedValue retrieves nested field', function () {
             'id' => 1,
         ],
     ];
+
     expect(Form::getDotNotatedValue($nestedArray, 'customer.phone'))->toBe('123456789');
     expect(Form::getDotNotatedValue($nestedArray, 'customer.name'))->toBe('Anna');
     expect(Form::getDotNotatedValue($nestedArray, 'order.id'))->toBe(1);
@@ -39,6 +40,7 @@ test('getDotNotatedValue retrieves deeply nested field', function () {
             ],
         ],
     ];
+
     expect(Form::getDotNotatedValue($deepNestedArray, 'customer.details.address.city'))->toBe('Berlin');
 });
 
@@ -52,5 +54,6 @@ test('getDotNotatedValue returns null for non-existent nested field', function (
             ],
         ],
     ];
+
     expect(Form::getDotNotatedValue($deepNestedArray, 'customer.details.phone'))->toBeNull();
 });
