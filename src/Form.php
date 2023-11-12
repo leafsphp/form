@@ -211,7 +211,7 @@ class Form
 
                     $errorMessage = str_replace(
                         ['{field}', '{Field}', '{value}'],
-                        [$field, ucfirst($field), $value],
+                        [$field, ucfirst($field), is_array($value) ? json_encode($value) : $value],
                         static::$messages[$rule[0]] ?? static::$messages[explode('(', $rule[0])[0] ?? 'any'] ?? '{Field} is invalid!'
                     );
 
