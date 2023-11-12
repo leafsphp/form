@@ -232,7 +232,8 @@ class Form
      * @param string $key The key to search for.
      * @return mixed|null The value if found, null otherwise.
      */
-    public static function getDotNotatedValue($array, $key) {
+    public static function getDotNotatedValue($array, $key)
+    {
         $keys = explode('.', $key);
         foreach ($keys as $k) {
             if (!isset($array[$k])) {
@@ -240,6 +241,7 @@ class Form
             }
             $array = $array[$k];
         }
+
         return $array;
     }
 
