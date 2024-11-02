@@ -9,6 +9,7 @@ namespace Leaf;
  * ----
  * Leaf's form validation library
  *
+ * @version 3.0.0
  * @since 1.0.0
  */
 class Form
@@ -131,16 +132,7 @@ class Form
         };
     }
 
-    /**
-     * Validate a single rule
-     *
-     * @param string|array $rule The rule(s) to validate against
-     * @param mixed $valueToTest The value to validate
-     * @param mixed $param The rule parameter
-     *
-     * @return bool
-     */
-    public function test($rule, $valueToTest, $fieldName = null): bool
+    protected function test($rule, $valueToTest, $fieldName = 'item'): bool
     {
         if (is_string($rule)) {
             $rule = preg_match_all('/[^|<>]+(?:<[^>]+>)?/', $rule, $matches);
@@ -154,18 +146,10 @@ class Form
         foreach ($rule as $currentRule) {
             $param = [];
 
+            $currentRule = strtolower($currentRule);
+
             if ($currentRule === 'optional') {
                 continue;
-            }
-
-            if (!$valueToTest) {
-                $this->addError($fieldName, str_replace(
-                    ['{field}', '{Field}', '{value}'],
-                    [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
-                    $this->messages['required'] ?? '{Field} is invalid!'
-                ));
-
-                return false;
             }
 
             if (preg_match('/^[a-zA-Z]+<(.*(\|.*)*)>$/', $currentRule)) {
@@ -190,6 +174,16 @@ class Form
 
             if (!isset($this->rules[$currentRule])) {
                 throw new \Exception("Rule $currentRule does not exist");
+            }
+
+            if (!$valueToTest) {
+                $this->addError($fieldName, str_replace(
+                    ['{field}', '{Field}', '{value}'],
+                    [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                    $this->messages['required'] ?? '{Field} is invalid!'
+                ));
+
+                return false;
             }
 
             if (is_callable($this->rules[$currentRule])) {
@@ -236,6 +230,22 @@ class Form
     }
 
     /**
+     * Validate a single rule
+     *
+     * @param string|array $rule The rule(s) to validate against
+     * @param mixed $valueToTest The value to validate
+     * @param mixed $fieldName The rule parameter
+     *
+     * @return bool
+     */
+    public function validateRule($rule, $valueToTest, $fieldName = 'item'): bool
+    {
+        $this->errors = [];
+
+        return $this->test($rule, $valueToTest, $fieldName);
+    }
+
+    /**
      * Validate form data
      *
      * @param array $dataSource The data to validate
@@ -245,6 +255,9 @@ class Form
      */
     public function validate(array $dataSource, array $validationSet)
     {
+        // clear previous errors
+        $this->errors = [];
+
         $output = $dataSource;
 
         foreach ($validationSet as $itemToValidate => $userRules) {
@@ -286,6 +299,16 @@ class Form
     }
 
     /**
+     * Add validation error message
+     * @param string|array $field The field to add the message to
+     * @param string|null $message The error message if $field is a string
+     */
+    public function addErrorMessage($field, ?string $message = null)
+    {
+        return $this->addMessage($field, $message);
+    }
+
+     /**
      * Add validation error message
      * @param string|array $field The field to add the message to
      * @param string|null $message The error message if $field is a string
