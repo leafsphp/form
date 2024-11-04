@@ -188,13 +188,17 @@ class Form
 
             if (is_callable($this->rules[$currentRule])) {
                 if (!call_user_func($this->rules[$currentRule], $valueToTest, $param, $fieldName)) {
+                    if (empty($param)) {
+                        $param = ['Item'];
+                    }
+
                     $this->addError($fieldName, sprintf(
                         str_replace(
                             ['{field}', '{Field}', '{value}'],
                             [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
                             $this->messages[$currentRule] ?? '{Field} is invalid!'
                         ),
-                        ...[$param],
+                        ...$param,
                     ));
                 }
 
