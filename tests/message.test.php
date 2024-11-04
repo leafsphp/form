@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Leaf\Form;
 
 test('message can be set for a rule', function () {
     validator()->message('number', 'This is a custom message');

@@ -288,7 +288,7 @@ class Form
     public function addRule(string $name, $handler, ?string $message = null)
     {
         $this->rules[strtolower($name)] = $handler;
-        $this->messages[strtolower($name)] = $message ?? "%s is invalid!";
+        $this->messages[strtolower($name)] = $message ?? '%s is invalid!';
     }
 
     /**
@@ -312,11 +312,11 @@ class Form
         return $this->addMessage($field, $message);
     }
 
-     /**
-     * Add validation error message
-     * @param string|array $field The field to add the message to
-     * @param string|null $message The error message if $field is a string
-     */
+    /**
+    * Add validation error message
+    * @param string|array $field The field to add the message to
+    * @param string|null $message The error message if $field is a string
+    */
     public function addMessage($field, ?string $message = null)
     {
         if (is_array($field)) {
@@ -342,7 +342,7 @@ class Form
         $form_fields = '';
 
         foreach ($fields as $key => $value) {
-            $form_fields = $form_fields . "<input type=\"hidden\" name=\"$key\" value=" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . ">";
+            $form_fields = $form_fields . "<input type=\"hidden\" name=\"$key\" value=" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '>';
         }
 
         echo "

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Leaf\Form;
 
 test('can perform inline validation', function () {
     $value = '';

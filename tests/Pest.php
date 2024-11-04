@@ -15,7 +15,8 @@ class Cache
     }
 }
 
-function validator() {
+function validator()
+{
     if (!Cache::get()) {
         Cache::set(new \Leaf\Form());
     }
