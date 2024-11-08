@@ -130,6 +130,11 @@ class Form
         $this->rules['in'] = function ($value, $param) {
             return in_array($value, $param);
         };
+
+        $this->rules['matchesvalueof'] = function ($value, $param) {
+            $this->message('matchesvalueof', "{field} must match the value of $param");
+            return \Leaf\Http\Request::get($param) === $value;
+        };
     }
 
     protected function test($rule, $valueToTest, $fieldName = 'item'): bool
@@ -190,6 +195,10 @@ class Form
                 if (!call_user_func($this->rules[$currentRule], $valueToTest, $param, $fieldName)) {
                     if (empty($param)) {
                         $param = ['Item'];
+                    }
+
+                    if (!is_array($param)) {
+                        $param = [$param];
                     }
 
                     $this->addError($fieldName, sprintf(
@@ -313,10 +322,10 @@ class Form
     }
 
     /**
-    * Add validation error message
-    * @param string|array $field The field to add the message to
-    * @param string|null $message The error message if $field is a string
-    */
+     * Add validation error message
+     * @param string|array $field The field to add the message to
+     * @param string|null $message The error message if $field is a string
+     */
     public function addMessage($field, ?string $message = null)
     {
         if (is_array($field)) {
