@@ -31,8 +31,7 @@
     "prefer-stable": true,
     "require": {
         "ext-json": "*",
-        "leafs/anchor": "*",
-        "leafs/fs": "^2.0"
+        "leafs/anchor": "*"
     },
     "require-dev": {
         "pestphp/pest": "^1.22",
