@@ -76,6 +76,7 @@ class Form
         'max' => '{Field} must not exceed %s characters',
         'between' => '{Field} must be between %s and %s characters long',
         'match' => '{Field} must match the %s field',
+        'matchesvalueof' => '{Field} must match the value of %s',
         'contains' => '{Field} must contain %s',
         'boolean' => '{Field} must be a boolean',
         'truefalse' => '{Field} must be a boolean',
@@ -132,7 +133,6 @@ class Form
         };
 
         $this->rules['matchesvalueof'] = function ($value, $param) {
-            $this->message('matchesvalueof', "{field} must match the value of $param");
             return \Leaf\Http\Request::get($param) === $value;
         };
     }
@@ -271,17 +271,23 @@ class Form
         // clear previous errors
         $this->errors = [];
 
-        $output = $dataSource;
+        $output = [];
 
         foreach ($validationSet as $itemToValidate => $userRules) {
             if (empty($userRules)) {
+                $output[$itemToValidate] = Anchor::deepGetDot($dataSource, $itemToValidate);
                 continue;
             }
+
+            $endsWithWildcard = substr($itemToValidate, -1) === '*';
+            $itemToValidate = $endsWithWildcard ? substr($itemToValidate, 0, -1) : $itemToValidate;
 
             $value = Anchor::deepGetDot($dataSource, $itemToValidate);
 
             if (!$this->test($userRules, $value, $itemToValidate)) {
                 $output = false;
+            } else if ($output !== false && !$endsWithWildcard) {
+                $output = Anchor::deepSetDot($output, $itemToValidate, $value);
             }
         }
 
