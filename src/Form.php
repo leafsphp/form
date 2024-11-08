@@ -276,6 +276,7 @@ class Form
         foreach ($validationSet as $itemToValidate => $userRules) {
             if (empty($userRules)) {
                 $output[$itemToValidate] = Anchor::deepGetDot($dataSource, $itemToValidate);
+
                 continue;
             }
 
@@ -286,7 +287,7 @@ class Form
 
             if (!$this->test($userRules, $value, $itemToValidate)) {
                 $output = false;
-            } else if ($output !== false && !$endsWithWildcard) {
+            } elseif ($output !== false && !$endsWithWildcard) {
                 if (
                     (is_array($userRules) && in_array('optional', $userRules))
                     || (is_string($userRules) && strpos($userRules, 'optional') !== false)
