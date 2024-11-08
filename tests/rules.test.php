@@ -36,7 +36,9 @@ test('can add custom validation rules with closure', function () {
         'item2' => 'not custom',
     ];
 
-    expect(validator()->validate($data, ['item1' => 'anotherCustomRule']))->toBe($data);
+    expect(validator()->validate($data, ['item1' => 'anotherCustomRule']))->toBe([
+        'item1' => 'custom',
+    ]);
     expect(validator()->validate($data, ['item2' => 'anotherCustomRule']))->toBe(false);
     expect(validator()->errors())->toHaveKey('item2');
 });

@@ -287,6 +287,17 @@ class Form
             if (!$this->test($userRules, $value, $itemToValidate)) {
                 $output = false;
             } else if ($output !== false && !$endsWithWildcard) {
+                if (
+                    (is_array($userRules) && in_array('optional', $userRules))
+                    || (is_string($userRules) && strpos($userRules, 'optional') !== false)
+                ) {
+                    if (Anchor::deepGetDot($dataSource, $itemToValidate) !== null) {
+                        $output = Anchor::deepSetDot($output, $itemToValidate, $value);
+                    }
+
+                    continue;
+                }
+
                 $output = Anchor::deepSetDot($output, $itemToValidate, $value);
             }
         }
