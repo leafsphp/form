@@ -139,6 +139,8 @@ class Form
 
     protected function test($rule, $valueToTest, $fieldName = 'item'): bool
     {
+        $expandedErrors = false;
+
         if (is_string($rule)) {
             $rule = preg_match_all('/[^|<>]+(?:<[^>]+>)?/', $rule, $matches);
             $rule = $matches[0];
@@ -148,12 +150,20 @@ class Form
             return true;
         }
 
+        if (in_array('expanded', $rule)) {
+            $expandedErrors = true;
+        }
+
         foreach ($rule as $currentRule) {
             $param = [];
 
             $currentRule = strtolower($currentRule);
 
             if ($currentRule === 'optional') {
+                continue;
+            }
+
+            if ($currentRule === 'expanded') {
                 continue;
             }
 
@@ -182,11 +192,19 @@ class Form
             }
 
             if (!$valueToTest) {
-                $this->addError($fieldName, str_replace(
-                    ['{field}', '{Field}', '{value}'],
-                    [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
-                    $this->messages['required'] ?? '{Field} is invalid!'
-                ));
+                if ($expandedErrors) {
+                    $this->addError($fieldName, str_replace(
+                        ['{field}', '{Field}', '{value}'],
+                        [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                        $this->messages['required'] ?? '{Field} is invalid!'
+                    ));
+                } else {
+                    $this->errors[$fieldName] = str_replace(
+                        ['{field}', '{Field}', '{value}'],
+                        [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                        $this->messages['required'] ?? '{Field} is invalid!'
+                    );
+                }
 
                 return false;
             }
@@ -201,14 +219,25 @@ class Form
                         $param = [$param];
                     }
 
-                    $this->addError($fieldName, sprintf(
-                        str_replace(
-                            ['{field}', '{Field}', '{value}'],
-                            [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
-                            $this->messages[$currentRule] ?? '{Field} is invalid!'
-                        ),
-                        ...$param,
-                    ));
+                    if ($expandedErrors) {
+                        $this->addError($fieldName, sprintf(
+                            str_replace(
+                                ['{field}', '{Field}', '{value}'],
+                                [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                                $this->messages[$currentRule] ?? '{Field} is invalid!'
+                            ),
+                            ...$param,
+                        ));
+                    } else {
+                        $this->errors[$fieldName] = sprintf(
+                            str_replace(
+                                ['{field}', '{Field}', '{value}'],
+                                [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                                $this->messages[$currentRule] ?? '{Field} is invalid!'
+                            ),
+                            ...$param,
+                        );
+                    }
                 }
 
                 continue;
@@ -228,14 +257,25 @@ class Form
                     FILTER_VALIDATE_BOOLEAN
                 )
             ) {
-                $this->addError($fieldName, sprintf(
-                    str_replace(
-                        ['{field}', '{Field}', '{value}'],
-                        [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
-                        $this->messages[$currentRule] ?? '{Field} is invalid!'
-                    ),
-                    ...$param,
-                ));
+                if ($expandedErrors) {
+                    $this->addError($fieldName, sprintf(
+                        str_replace(
+                            ['{field}', '{Field}', '{value}'],
+                            [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                            $this->messages[$currentRule] ?? '{Field} is invalid!'
+                        ),
+                        ...$param,
+                    ));
+                } else {
+                    $this->errors[$fieldName] = sprintf(
+                        str_replace(
+                            ['{field}', '{Field}', '{value}'],
+                            [$fieldName, ucfirst($fieldName), is_array($valueToTest) ? json_encode($valueToTest) : $valueToTest],
+                            $this->messages[$currentRule] ?? '{Field} is invalid!'
+                        ),
+                        ...$param,
+                    );
+                }
             }
         }
 
