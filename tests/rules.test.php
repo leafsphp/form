@@ -53,7 +53,7 @@ test('can add custom validation rules with closure and custom message', function
     expect(validator()->validate($dataToValidate1, ['item1' => 'anotherCustomRule']))->toBe(false);
 
     expect(validator()->errors())->toHaveKey('item1');
-    expect(validator()->errors()['item1'][0] ?? '')->toBe('This is a custom message');
+    expect(validator()->errors()['item1'] ?? '')->toBe('This is a custom message');
 });
 
 test('can add custom validation rules with closure and custom message with placeholder', function () {
@@ -66,7 +66,7 @@ test('can add custom validation rules with closure and custom message with place
     expect(validator()->validate($dataToValidate1, ['item2' => 'anotherCustomRule']))->toBe(false);
 
     expect(validator()->errors())->toHaveKey('item2');
-    expect(validator()->errors()['item2'][0] ?? '')->toBe('This is a custom message for item2');
+    expect(validator()->errors()['item2'] ?? '')->toBe('This is a custom message for item2');
 });
 
 test('can add custom validation rules with closure and custom message with placeholder and custom value', function () {
@@ -79,7 +79,7 @@ test('can add custom validation rules with closure and custom message with place
     expect(validator()->validate($dataToValidate1, ['item3' => 'anotherCustomRule']))->toBe(false);
 
     expect(validator()->errors())->toHaveKey('item3');
-    expect(validator()->errors()['item3'][0] ?? '')->toBe('This is a custom message for item3 with value not custom');
+    expect(validator()->errors()['item3'] ?? '')->toBe('This is a custom message for item3 with value not custom');
 });
 
 test('can add custom validation rules with regex and custom message', function () {
@@ -89,7 +89,7 @@ test('can add custom validation rules with regex and custom message', function (
     expect(validator()->validate($dataToValidate1, ['item4' => 'mustHaveTheWordAvailable']))->toBe(false);
 
     expect(validator()->errors())->toHaveKey('item4');
-    expect(validator()->errors()['item4'][0] ?? '')->toBe('This is a custom message');
+    expect(validator()->errors()['item4'] ?? '')->toBe('This is a custom message');
 });
 
 test('can add custom validation rules with regex and custom message with placeholder', function () {
@@ -99,7 +99,7 @@ test('can add custom validation rules with regex and custom message with placeho
     expect(validator()->validate($dataToValidate1, ['item5' => 'mustHaveTheWordAvailable']))->toBe(false);
 
     expect(validator()->errors())->toHaveKey('item5');
-    expect(validator()->errors()['item5'][0] ?? '')->toBe('This is a custom message for item5');
+    expect(validator()->errors()['item5'] ?? '')->toBe('This is a custom message for item5');
 });
 
 test('can add custom validation rules with regex and custom message with placeholder and custom value', function () {
@@ -109,5 +109,5 @@ test('can add custom validation rules with regex and custom message with placeho
     expect(validator()->validate($dataToValidate1, ['item6' => 'mustHaveTheWordAvailable']))->toBe(false);
 
     expect(validator()->errors())->toHaveKey('item6');
-    expect(validator()->errors()['item6'][0] ?? '')->toBe('This is a custom message for item6 with value not in here');
+    expect(validator()->errors()['item6'] ?? '')->toBe('This is a custom message for item6 with value not in here');
 });

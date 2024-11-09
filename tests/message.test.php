@@ -21,7 +21,7 @@ test('message can be set for multiple rules', function () {
 
     $itemToValidate = ['data5' => 'wrong'];
 
-    expect(validator()->validate($itemToValidate, ['data5' => 'number|email']))->toBe(false);
+    expect(validator()->validate($itemToValidate, ['data5' => 'expanded|number|email']))->toBe(false);
     expect(validator()->errors())->toHaveKey('data5');
     expect(validator()->errors()['data5'])->toContain('This is a custom message');
     expect(validator()->errors()['data5'])->toContain('This is another custom message');
@@ -32,7 +32,7 @@ test('message can be set for a rule with a custom placeholder', function () {
 
     $itemToValidate = ['data6' => 'wrong'];
 
-    expect(validator()->validate($itemToValidate, ['data6' => 'number']))->toBe(false);
+    expect(validator()->validate($itemToValidate, ['data6' => 'number|expanded']))->toBe(false);
     expect(validator()->errors())->toHaveKey('data6');
     expect(validator()->errors()['data6'][0] ?? '')->toBe('This is a custom message for data6');
 });
@@ -44,7 +44,7 @@ test('message can be set for a rule with a custom capitalized placeholder', func
 
     expect(validator()->validate($itemToValidate, ['data2' => 'number']))->toBe(false);
     expect(validator()->errors())->toHaveKey('data2');
-    expect(validator()->errors()['data2'][0] ?? '')->toBe('This is a custom message for Data2');
+    expect(validator()->errors()['data2'] ?? '')->toBe('This is a custom message for Data2');
 });
 
 test('message can be set for a rule with a custom placeholder and custom value', function () {
@@ -54,7 +54,7 @@ test('message can be set for a rule with a custom placeholder and custom value',
 
     expect(validator()->validate($itemToValidate, ['data3' => 'number']))->toBe(false);
     expect(validator()->errors())->toHaveKey('data3');
-    expect(validator()->errors()['data3'][0] ?? '')->toBe('This is a custom message for data3 with value wrong');
+    expect(validator()->errors()['data3'] ?? '')->toBe('This is a custom message for data3 with value wrong');
 });
 
 test('show error if no message is provided', function () {
