@@ -146,7 +146,7 @@ class Form
             $rule = $matches[0];
         }
 
-        if (in_array('optional', $rule) && empty($valueToTest)) {
+        if (in_array('optional', $rule) && ($valueToTest === null || $valueToTest === '' || $valueToTest === [])) {
             return true;
         }
 
@@ -175,7 +175,6 @@ class Form
                 $param = $ruleParams;
             }
 
-
             if (strpos($currentRule, ':') !== false && strpos($currentRule, '|') === false) {
                 $ruleParts = explode(':', $currentRule);
 
@@ -191,7 +190,8 @@ class Form
                 throw new \Exception("Rule $currentRule does not exist");
             }
 
-            if (!$valueToTest) {
+            $isMissing = $valueToTest === null || $valueToTest === '' || ($valueToTest === []);
+            if ($isMissing) {
                 if ($expandedErrors) {
                     $this->addError($fieldName, str_replace(
                         ['{field}', '{Field}', '{value}'],
@@ -245,6 +245,10 @@ class Form
 
             if (!is_array($param)) {
                 $param = [$param];
+            }
+
+            if (is_bool($valueToTest)) {
+                $valueToTest = $valueToTest ? '1' : '0';
             }
 
             if (is_float($valueToTest)) {
