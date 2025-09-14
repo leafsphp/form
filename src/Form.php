@@ -7,9 +7,9 @@ namespace Leaf;
 /**
  * Leaf Form
  * ----
- * Leaf's form validation library
+ * Leaf's form validation library with enhanced wildcard and JSON validation support
  *
- * @version 3.0.0
+ * @version 3.1.0
  * @since 1.0.0
  */
 class Form
@@ -303,7 +303,7 @@ class Form
     }
 
     /**
-     * Validate form data
+     * Validate form data with enhanced wildcard support
      *
      * @param array $dataSource The data to validate
      * @param array $validationSet The rules to validate against
@@ -312,38 +312,33 @@ class Form
      */
     public function validate(array $dataSource, array $validationSet)
     {
-        // clear previous errors
         $this->errors = [];
-
         $output = [];
 
-        foreach ($validationSet as $itemToValidate => $userRules) {
-            if (empty($userRules)) {
-                $output[$itemToValidate] = Anchor::deepGetDot($dataSource, $itemToValidate);
-
+        foreach ($validationSet as $fieldPath => $rules) {
+            if (empty($rules)) {
+                $output[$fieldPath] = $this->getValue($dataSource, $fieldPath);
                 continue;
             }
 
-            $endsWithWildcard = substr($itemToValidate, -1) === '*';
-            $itemToValidate = $endsWithWildcard ? substr($itemToValidate, 0, -1) : $itemToValidate;
-
-            $value = Anchor::deepGetDot($dataSource, $itemToValidate);
-
-            if (!$this->test($userRules, $value, $itemToValidate)) {
-                $output = false;
-            } elseif ($output !== false && !$endsWithWildcard) {
-                if (
-                    (is_array($userRules) && in_array('optional', $userRules))
-                    || (is_string($userRules) && strpos($userRules, 'optional') !== false)
-                ) {
-                    if (Anchor::deepGetDot($dataSource, $itemToValidate) !== null) {
-                        $output = Anchor::deepSetDot($output, $itemToValidate, $value);
-                    }
-
-                    continue;
+            // Check for wildcard in field path
+            if (strpos($fieldPath, '*') !== false) {
+                $result = $this->validateWildcardPath($dataSource, $fieldPath, $rules);
+                if ($result === false) {
+                    $output = false;
                 }
+            } else {
+                // Normal validation for fields without wildcards
+                $value = $this->getValue($dataSource, $fieldPath);
 
-                $output = Anchor::deepSetDot($output, $itemToValidate, $value);
+                if (!$this->test($rules, $value, $fieldPath)) {
+                    $output = false;
+                } elseif ($output !== false) {
+                    if ($this->isOptional($rules) && $value === null) {
+                        continue;
+                    }
+                    $output = $this->setValue($output, $fieldPath, $value);
+                }
             }
         }
 
@@ -438,17 +433,22 @@ class Form
     }
 
     /**
-     * Add validation error
+     * Add validation error with enhanced path support
      * @param string $field The field that has an error
      * @param string $error The error message
      */
-    public function addError(string $field, string $error)
+    public function addError(string $field, string $error): void
     {
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
         }
 
-        array_push($this->errors[$field], $error);
+        if (is_array($this->errors[$field])) {
+            $this->errors[$field][] = $error;
+        } else {
+            // Compatibility with original format
+            $this->errors[$field] = $error;
+        }
     }
 
     /**
@@ -467,5 +467,135 @@ class Form
     public function errors(): array
     {
         return $this->errors;
+    }
+
+    /**
+     * Validate a path that contains wildcards
+     */
+    protected function validateWildcardPath(array $dataSource, string $fieldPath, $rules)
+    {
+        $parts = explode('.', $fieldPath);
+        $wildcardIndex = array_search('*', $parts);
+
+        if ($wildcardIndex === false) {
+            // No wildcard found, fallback to normal validation
+            $value = $this->getValue($dataSource, $fieldPath);
+            return $this->test($rules, $value, $fieldPath);
+        }
+
+        // Build base path and remaining path
+        $basePath = implode('.', array_slice($parts, 0, $wildcardIndex));
+        $remainingPath = implode('.', array_slice($parts, $wildcardIndex + 1));
+
+        $baseValue = $this->getValue($dataSource, $basePath);
+
+        if (!is_array($baseValue)) {
+            if ($this->isOptional($rules)) {
+                return true; // Optional and not array, OK
+            }
+            return false; // Required but not array, error
+        }
+
+        $allValid = true;
+
+        foreach ($baseValue as $index => $item) {
+            $currentPath = $basePath . '.' . $index . ($remainingPath ? '.' . $remainingPath : '');
+
+            if ($remainingPath) {
+                // If remaining has more wildcards, recurse
+                if (strpos($remainingPath, '*') !== false) {
+                    $subResult = $this->validateWildcardPath([$index => $item], $index . '.' . $remainingPath, $rules);
+                    if (!$subResult) {
+                        $allValid = false;
+                    }
+                } else {
+                    // Normal getValue for path without more wildcards
+                    $currentValue = $this->getValue($item, $remainingPath);
+                    if (!$this->test($rules, $currentValue, $currentPath)) {
+                        $allValid = false;
+                    }
+                }
+            } else {
+                // No remainingPath, validate item itself
+                if (!$this->test($rules, $item, $currentPath)) {
+                    $allValid = false;
+                }
+            }
+        }
+
+        return $allValid;
+    }
+
+    /**
+     * Check if a rule is optional
+     */
+    protected function isOptional($rules): bool
+    {
+        if (is_array($rules)) {
+            return in_array('optional', $rules);
+        }
+
+        if (is_string($rules)) {
+            return strpos($rules, 'optional') !== false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get value using dot notation with fallback
+     */
+    protected function getValue($data, string $path)
+    {
+        if (class_exists('\Leaf\Anchor')) {
+            return \Leaf\Anchor::deepGetDot($data, $path);
+        }
+
+        // Manual fallback for dot notation
+        if (strpos($path, '.') === false) {
+            return $data[$path] ?? null;
+        }
+
+        $parts = explode('.', $path);
+        $current = $data;
+
+        foreach ($parts as $part) {
+            if (!is_array($current) || !array_key_exists($part, $current)) {
+                return null;
+            }
+            $current = $current[$part];
+        }
+
+        return $current;
+    }
+
+    /**
+     * Set value using dot notation with fallback
+     */
+    protected function setValue(array $data, string $path, $value): array
+    {
+        if (class_exists('\Leaf\Anchor')) {
+            return \Leaf\Anchor::deepSetDot($data, $path, $value);
+        }
+
+        // Manual fallback for dot notation
+        if (strpos($path, '.') === false) {
+            $data[$path] = $value;
+            return $data;
+        }
+
+        $parts = explode('.', $path);
+        $current = &$data;
+
+        for ($i = 0; $i < count($parts) - 1; $i++) {
+            $part = $parts[$i];
+            if (!isset($current[$part]) || !is_array($current[$part])) {
+                $current[$part] = [];
+            }
+            $current = &$current[$part];
+        }
+
+        $current[end($parts)] = $value;
+        return $data;
     }
 }
