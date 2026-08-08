@@ -3,7 +3,7 @@ app:
 
 tests:
   engine: pest
-  parallel: true
+  parallel: false
   paths:
     - tests
   files:

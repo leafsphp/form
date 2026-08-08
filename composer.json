@@ -32,12 +32,12 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "leafs/anchor": "*",
-        "leafs/alchemy": "v5.x-dev"
+        "leafs/anchor": "*"
     },
     "require-dev": {
         "pestphp/pest": "*",
-        "friendsofphp/php-cs-fixer": "*"
+        "friendsofphp/php-cs-fixer": "*",
+        "leafs/alchemy": "v5.x-dev"
     },
     "scripts": {
         "test": "@php vendor/bin/alchemy test",
