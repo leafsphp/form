@@ -62,7 +62,7 @@ class Form
         'email' => '{Field} must be a valid email address',
         'alpha' => '{Field} must contain only alphabets and spaces',
         'text' => '{Field} must contain only alphabets and spaces',
-        'string' => '{Field} must contain only alphabets and spaces',
+        'string' => '{Field} must be a string',
         'textonly' => '{Field} must contain only alphabets',
         'alphanum' => '{Field} must contain only alphabets and numbers',
         'alphadash' => '{Field} must contain only alphabets, numbers, dashes and underscores',
