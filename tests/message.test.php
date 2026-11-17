@@ -60,3 +60,15 @@ test('message can be set for a rule with a custom placeholder and custom value',
 test('show error if no message is provided', function () {
     validator()->message('number');
 })->throws(Exception::class, 'Message cannot be empty');
+
+test('subclasses can override addError without a return type', function () {
+    $form = new class extends \Leaf\Form {
+        public function addError(string $field, string $error)
+        {
+            parent::addError($field, $error);
+        }
+    };
+
+    expect($form->validate(['email' => 'invalid'], ['email' => 'expanded|email']))->toBe(false);
+    expect($form->errors())->toHaveKey('email');
+});

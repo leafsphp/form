@@ -437,7 +437,7 @@ class Form
      * @param string $field The field that has an error
      * @param string $error The error message
      */
-    public function addError(string $field, string $error): void
+    public function addError(string $field, string $error)
     {
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
