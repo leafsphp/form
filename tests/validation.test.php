@@ -69,3 +69,31 @@ test('optional rule works correctly no matter it\'s position', function () {
     expect($validatedData)->toBe($itemsToValidate);
     expect(validator()->errors())->not()->toHaveKey('test6');
 });
+
+test('falsy boolean values are treated as present', function ($value) {
+    $form = new \Leaf\Form();
+    $data = ['flag' => $value];
+
+    expect($form->validate($data, ['flag' => 'boolean']))->toBe($data);
+    expect($form->validate($data, ['flag' => 'optional|boolean']))->toBe($data);
+    expect($form->validate($data, ['flag' => 'optional|email']))->toBe(false);
+    expect($form->errors()['flag'])->toBe('Flag must be a valid email address');
+})->with([
+    'integer zero' => [0],
+    'string zero' => ['0'],
+    'false' => [false],
+]);
+
+test('absent values still fail required validation and bypass optional rules', function ($value) {
+    $form = new \Leaf\Form();
+    $data = ['flag' => $value];
+
+    expect($form->validate($data, ['flag' => 'boolean']))->toBe(false);
+    expect($form->errors()['flag'])->toBe('Flag is required');
+    expect($form->validate($data, ['flag' => 'optional|email']))->toBe($value === null ? [] : $data);
+    expect($form->errors())->toBe([]);
+})->with([
+    'null' => [null],
+    'empty string' => [''],
+    'empty array' => [[]],
+]);
